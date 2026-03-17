@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WHI Auto-Farm Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg: #08080c;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --text: #e0e0ec;
+    --text-dim: #6a6a80;
+    --accent: #6488ff;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+}
+
+header {
+    padding: 40px 48px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -1px;
+}
+
+.logo h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.logo p {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 2px;
+}
+
+.header-stats {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+}
+
+.header-stat {
+    text-align: right;
+}
+
+.header-stat .value {
+    font-size: 28px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -1px;
+}
+
+.header-stat .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.header-stat .value.green { color: var(--green); }
+.header-stat .value.amber { color: var(--amber); }
+.header-stat .value.accent { color: var(--accent); }
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+}
+
+main {
+    padding: 32px 48px 48px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    border-color: #3a3a50;
+    transform: translateY(-1px);
+}
+
+.card.offline {
+    opacity: 0.45;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.card-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.tier-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.tier-badge.high { background: rgba(168, 139, 250, 0.15); color: var(--purple); border: 1px solid rgba(168, 139, 250, 0.25); }
+.tier-badge.mid { background: rgba(100, 136, 255, 0.15); color: var(--accent); border: 1px solid rgba(100, 136, 255, 0.25); }
+.tier-badge.low { background: rgba(34, 211, 238, 0.15); color: var(--cyan); border: 1px solid rgba(34, 211, 238, 0.25); }
+.tier-badge.trade { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.25); }
+
+.card-status {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green);
+    margin-bottom: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.card-status.offline-text { color: var(--text-dim); }
+
+.card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.stat {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+.stat .stat-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.stat .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.stat .stat-value.gold { color: var(--amber); }
+
+.card-indicators {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.indicator-tag {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--amber);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-dim);
+}
+
+.empty-state h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.empty-state p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+}
+
+.last-update {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.filter-btn:hover { border-color: #4a4a60; color: var(--text); }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.sort-btn {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.sort-btn:hover { border-color: #4a4a60; color: var(--text); }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<header>
+    <div class="logo">
+        <div class="logo-icon">W</div>
+        <div>
+            <h1>WHI Auto-Farm</h1>
+            <p><span class="pulse-dot"></span>dashboard live</p>
+        </div>
+    </div>
+    <div class="header-stats">
+        <div class="header-stat">
+            <div class="value accent" id="totalAccounts">0</div>
+            <div class="label">Accounts</div>
+        </div>
+        <div class="header-stat">
+            <div class="value green" id="onlineCount">0</div>
+            <div class="label">Online</div>
+        </div>
+        <div class="header-stat">
+            <div class="value amber" id="totalCaught">0</div>
+            <div class="label">Total Caught</div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="online">Online</button>
+        <button class="filter-btn" data-filter="offline">Offline</button>
+        <button class="filter-btn" data-filter="high">High</button>
+        <button class="filter-btn" data-filter="mid">Mid</button>
+        <button class="filter-btn" data-filter="low">Low</button>
+    </div>
+    <div class="grid" id="grid"></div>
+</main>
+
+<script>
+const POLL_INTERVAL = 3000;
+const OFFLINE_THRESHOLD = 30000; // 30s no update = offline
+let currentFilter = "all";
+let accounts = {};
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        render();
+    });
+});
+
+function timeAgo(ts) {
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 5) return "just now";
+    if (diff < 60) return diff + "s ago";
+    if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+    if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+    return Math.floor(diff / 86400) + "d ago";
+}
+
+function formatUptime(seconds) {
+    if (!seconds || seconds <= 0) return "0s";
+    const d = Math.floor(seconds / 86400);
+    const h = Math.floor((seconds % 86400) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    if (d > 0) return d + "d " + h + "h";
+    if (h > 0) return h + "h " + m + "m";
+    return m + "m";
+}
+
+function isOnline(acc) {
+    return acc.timestamp && (Date.now() - acc.timestamp) < OFFLINE_THRESHOLD;
+}
+
+function render() {
+    const grid = document.getElementById("grid");
+    const entries = Object.entries(accounts);
+
+    // Sort: online first, then alphabetical
+    entries.sort((a, b) => {
+        const aOn = isOnline(a[1]) ? 0 : 1;
+        const bOn = isOnline(b[1]) ? 0 : 1;
+        if (aOn !== bOn) return aOn - bOn;
+        return a[0].localeCompare(b[0]);
+    });
+
+    // Filter
+    const filtered = entries.filter(([name, acc]) => {
+        if (currentFilter === "all") return true;
+        if (currentFilter === "online") return isOnline(acc);
+        if (currentFilter === "offline") return !isOnline(acc);
+        if (currentFilter === "high" || currentFilter === "mid" || currentFilter === "low")
+            return (acc.tier || "").toLowerCase() === currentFilter;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><h2>No accounts</h2><p>waiting for status reports...</p></div>`;
+        return;
+    }
+
+    let totalCaught = 0;
+    let onlineCount = 0;
+
+    entries.forEach(([, acc]) => {
+        totalCaught += acc.animalsCaptured || 0;
+        if (isOnline(acc)) onlineCount++;
+    });
+
+    document.getElementById("totalAccounts").textContent = entries.length;
+    document.getElementById("onlineCount").textContent = onlineCount;
+    document.getElementById("totalCaught").textContent = totalCaught.toLocaleString();
+
+    grid.innerHTML = filtered.map(([name, acc]) => {
+        const online = isOnline(acc);
+        const tier = (acc.tier || "?").toLowerCase();
+        const indicators = acc.indicators || {};
+
+        const indicatorHtml = Object.entries(indicators)
+            .map(([ind, count]) => `<span class="indicator-tag">${ind}: ${count}</span>`)
+            .join("");
+
+        return `
+        <div class="card ${online ? "" : "offline"}">
+            <div class="card-header">
+                <span class="card-name" title="${name}">${name}</span>
+                <span class="tier-badge ${tier}">${(acc.tier || "?").toUpperCase()}</span>
+            </div>
+            <div class="card-status ${online ? "" : "offline-text"}">${online ? (acc.status || "Running") : "Offline"}</div>
+            <div class="card-stats">
+                <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
+                <div class="stat"><div class="stat-label">Level</div><div class="stat-value">${acc.level || 0}</div></div>
+                <div class="stat"><div class="stat-label">Caught</div><div class="stat-value gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
+                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Lassos</div><div class="stat-value">${(acc.lassoCount || 0).toLocaleString()}</div></div>
+            </div>
+            ${indicatorHtml ? `<div class="card-indicators">${indicatorHtml}</div>` : ""}
+            <div class="last-update">${acc.timestamp ? timeAgo(acc.timestamp) : "never"}</div>
+        </div>`;
+    }).join("");
+}
+
+async function poll() {
+    try {
+        const res = await fetch("/api/accounts");
+        if (res.ok) {
+            accounts = await res.json();
+            render();
+        }
+    } catch (e) {
+        // silent
+    }
+}
+
+poll();
+setInterval(poll, POLL_INTERVAL);
+</script>
+</body>
+</html>
