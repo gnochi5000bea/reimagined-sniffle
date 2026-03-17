@@ -58,7 +58,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`[WHI Dashboard] Running on http://localhost:${PORT}`);
-    console.log(`[WHI Dashboard] Lua scripts should POST to http://YOUR_IP:${PORT}/api/status`);
-    console.log(`[WHI Dashboard] Open http://localhost:${PORT} in your browser`);
+    console.log(`[WHI Dashboard] Initialized!`);
 });
