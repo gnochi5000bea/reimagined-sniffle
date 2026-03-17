@@ -108,6 +108,7 @@ header {
 .header-stat .value.green { color: var(--green); }
 .header-stat .value.amber { color: var(--amber); }
 .header-stat .value.accent { color: var(--accent); }
+.header-stat .value.purple { color: var(--purple); }
 
 .pulse-dot {
     width: 8px;
@@ -138,7 +139,7 @@ main {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 20px;
+    padding: 20px 20px 28px;
     transition: border-color 0.2s, transform 0.15s;
     position: relative;
     overflow: hidden;
@@ -231,21 +232,63 @@ main {
 
 .card-indicators {
     margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
 }
 
-.indicator-tag {
+.indicator-group {
+    margin-bottom: 6px;
+}
+
+.indicator-header {
     font-size: 10px;
     font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: rgba(251, 191, 36, 0.1);
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px 4px 0 0;
+    background: rgba(251, 191, 36, 0.12);
     color: var(--amber);
     border: 1px solid rgba(251, 191, 36, 0.2);
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
 }
+
+.indicator-header:hover { background: rgba(251, 191, 36, 0.18); }
+
+.indicator-count {
+    background: rgba(251, 191, 36, 0.25);
+    padding: 0 6px;
+    border-radius: 3px;
+    font-size: 9px;
+}
+
+.indicator-animals {
+    background: var(--surface2);
+    border: 1px solid rgba(251, 191, 36, 0.12);
+    border-radius: 0 0 4px 4px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.indicator-animals::-webkit-scrollbar { width: 4px; }
+.indicator-animals::-webkit-scrollbar-track { background: transparent; }
+.indicator-animals::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.3); border-radius: 2px; }
+
+.indicator-animal {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 3px 8px;
+    color: var(--text);
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.indicator-animal:last-child { border-bottom: none; }
+
+.indicator-animal .breed { color: var(--text); font-weight: 500; }
+.indicator-animal .hair { color: var(--purple); }
 
 .empty-state {
     grid-column: 1 / -1;
@@ -339,6 +382,10 @@ main {
             <div class="value amber" id="totalCaught">0</div>
             <div class="label">Total Caught</div>
         </div>
+        <div class="header-stat">
+            <div class="value purple" id="totalIndicators">0</div>
+            <div class="label">Indicators Held</div>
+        </div>
     </div>
 </header>
 
@@ -421,24 +468,42 @@ function render() {
 
     let totalCaught = 0;
     let onlineCount = 0;
+    let totalIndicators = 0;
 
     entries.forEach(([, acc]) => {
         totalCaught += acc.animalsCaptured || 0;
         if (isOnline(acc)) onlineCount++;
+        const ind = acc.indicators || {};
+        for (const animals of Object.values(ind)) {
+            if (Array.isArray(animals)) totalIndicators += animals.length;
+        }
     });
 
     document.getElementById("totalAccounts").textContent = entries.length;
     document.getElementById("onlineCount").textContent = onlineCount;
     document.getElementById("totalCaught").textContent = totalCaught.toLocaleString();
+    document.getElementById("totalIndicators").textContent = totalIndicators.toLocaleString();
 
     grid.innerHTML = filtered.map(([name, acc]) => {
         const online = isOnline(acc);
         const tier = (acc.tier || "?").toLowerCase();
         const indicators = acc.indicators || {};
 
-        const indicatorHtml = Object.entries(indicators)
-            .map(([ind, count]) => `<span class="indicator-tag">${ind}: ${count}</span>`)
-            .join("");
+        let indicatorHtml = "";
+        for (const [ind, animals] of Object.entries(indicators)) {
+            if (!Array.isArray(animals) || animals.length === 0) continue;
+            const rows = animals.map(a =>
+                `<div class="indicator-animal"><span class="breed">${a.breed}</span><span class="hair">${a.maneColor}</span></div>`
+            ).join("");
+            indicatorHtml += `
+            <div class="indicator-group">
+                <div class="indicator-header">
+                    <span>${ind}</span>
+                    <span class="indicator-count">${animals.length}</span>
+                </div>
+                <div class="indicator-animals">${rows}</div>
+            </div>`;
+        }
 
         return `
         <div class="card ${online ? "" : "offline"}">
