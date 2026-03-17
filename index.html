@@ -288,6 +288,7 @@ main {
 .indicator-animal:last-child { border-bottom: none; }
 
 .indicator-animal .breed { color: var(--text); font-weight: 500; }
+.indicator-animal .coat { color: var(--cyan); }
 .indicator-animal .hair { color: var(--purple); }
 
 .empty-state {
@@ -493,7 +494,7 @@ function render() {
         for (const [ind, animals] of Object.entries(indicators)) {
             if (!Array.isArray(animals) || animals.length === 0) continue;
             const rows = animals.map(a =>
-                `<div class="indicator-animal"><span class="breed">${a.breed}</span><span class="hair">${a.maneColor}</span></div>`
+                `<div class="indicator-animal"><span class="breed">${a.breed}</span><span class="coat">${a.coat}</span><span class="hair">${a.maneColor}</span></div>`
             ).join("");
             indicatorHtml += `
             <div class="indicator-group">
