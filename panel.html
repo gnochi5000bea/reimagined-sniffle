@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WHI Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg: #08080c;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: #2a2a3a;
+    --text: #e0e0ec;
+    --text-dim: #6a6a80;
+    --accent: #6488ff;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 420px;
+    max-width: 90vw;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: var(--accent);
+}
+
+.subtitle {
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+}
+
+.section {
+    margin-bottom: 24px;
+}
+
+.section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+}
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.toggle-row .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.toggle {
+    width: 48px;
+    height: 26px;
+    border-radius: 13px;
+    background: #333;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    border: none;
+    outline: none;
+}
+
+.toggle.active {
+    background: var(--green);
+}
+
+.toggle .knob {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    transition: left 0.2s;
+}
+
+.toggle.active .knob {
+    left: 25px;
+}
+
+.input-row {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.input-row .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+}
+
+.input-row input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-row input:focus {
+    border-color: var(--accent);
+}
+
+.input-row input::placeholder {
+    color: var(--text-dim);
+}
+
+.save-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 8px;
+}
+
+.save-btn:hover { opacity: 0.9; }
+.save-btn:active { transform: scale(0.98); }
+
+.status-bar {
+    margin-top: 16px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    display: none;
+}
+
+.status-bar.success {
+    display: block;
+    background: rgba(74, 222, 128, 0.1);
+    color: var(--green);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+}
+
+.status-bar.error {
+    display: block;
+    background: rgba(248, 113, 113, 0.1);
+    color: var(--red);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.current-config {
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-radius: 8px;
+}
+
+.current-config .label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+}
+
+.config-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.8;
+}
+
+.config-line .val { color: var(--amber); }
+.config-line .val.on { color: var(--green); }
+.config-line .val.off { color: var(--red); }
+
+.online-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 16px;
+    text-align: center;
+}
+
+.online-count span { color: var(--green); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="panel">
+    <h1>WHI Control Panel</h1>
+    <p class="subtitle">changes apply to all accounts within ~10 seconds</p>
+
+    <div class="section">
+        <div class="section-label">Trade Mode</div>
+        <div class="toggle-row">
+            <span class="label">Enabled</span>
+            <button class="toggle" id="tradeToggle" onclick="toggleTrade()">
+                <div class="knob"></div>
+            </button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="input-row">
+            <div class="label">Target Player</div>
+            <input type="text" id="targetPlayer" placeholder="Username to trade with...">
+        </div>
+    </div>
+
+    <button class="save-btn" onclick="saveConfig()">Save & Push to All Accounts</button>
+
+    <div class="status-bar" id="statusBar"></div>
+
+    <div class="current-config">
+        <div class="label">Live Config</div>
+        <div class="config-line">Trade: <span class="val off" id="liveTradeEnabled">OFF</span></div>
+        <div class="config-line">Target: <span class="val" id="liveTargetPlayer">—</span></div>
+    </div>
+
+    <div class="online-count" id="onlineCount"></div>
+</div>
+
+<script>
+let tradeEnabled = false;
+
+function toggleTrade() {
+    tradeEnabled = !tradeEnabled;
+    const btn = document.getElementById("tradeToggle");
+    btn.classList.toggle("active", tradeEnabled);
+}
+
+async function saveConfig() {
+    const targetPlayer = document.getElementById("targetPlayer").value.trim();
+    const statusBar = document.getElementById("statusBar");
+
+    try {
+        const res = await fetch("/api/config", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                trade: {
+                    enabled: tradeEnabled,
+                    targetPlayer: targetPlayer,
+                }
+            })
+        });
+
+        if (res.ok) {
+            statusBar.className = "status-bar success";
+            statusBar.textContent = "Config pushed — accounts will pick it up within 10 seconds";
+            pollConfig();
+        } else {
+            statusBar.className = "status-bar error";
+            statusBar.textContent = "Failed to save config";
+        }
+    } catch (e) {
+        statusBar.className = "status-bar error";
+        statusBar.textContent = "Network error";
+    }
+
+    setTimeout(() => { statusBar.className = "status-bar"; }, 5000);
+}
+
+async function pollConfig() {
+    try {
+        const res = await fetch("/api/config");
+        if (res.ok) {
+            const cfg = await res.json();
+            tradeEnabled = cfg.trade.enabled;
+
+            document.getElementById("tradeToggle").classList.toggle("active", tradeEnabled);
+            document.getElementById("targetPlayer").value = cfg.trade.targetPlayer || "";
+
+            const enabledEl = document.getElementById("liveTradeEnabled");
+            enabledEl.textContent = tradeEnabled ? "ON" : "OFF";
+            enabledEl.className = "val " + (tradeEnabled ? "on" : "off");
+
+            document.getElementById("liveTargetPlayer").textContent = cfg.trade.targetPlayer || "—";
+        }
+    } catch (e) {}
+}
+
+async function pollOnline() {
+    try {
+        const res = await fetch("/api/accounts");
+        if (res.ok) {
+            const accounts = await res.json();
+            const total = Object.keys(accounts).length;
+            const online = Object.values(accounts).filter(a => a.timestamp && (Date.now() - a.timestamp) < 30000).length;
+            document.getElementById("onlineCount").innerHTML = `<span>${online}</span> / ${total} accounts online`;
+        }
+    } catch (e) {}
+}
+
+pollConfig();
+pollOnline();
+setInterval(pollConfig, 5000);
+setInterval(pollOnline, 5000);
+</script>
+</body>
+</html>
