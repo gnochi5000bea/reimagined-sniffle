@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WHI Auto-Farm Dashboard</title>
+<title>WHI Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,6 +45,8 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
 }
 
 .logo {
@@ -56,7 +58,7 @@ header {
 .logo-icon {
     width: 42px;
     height: 42px;
-    background: linear-gradient(135deg, var(--accent), var(--purple));
+    background: linear-gradient(135deg, var(--accent), var(--amber));
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -64,14 +66,9 @@ header {
     font-size: 20px;
     font-weight: 800;
     color: #fff;
-    letter-spacing: -1px;
 }
 
-.logo h1 {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-}
+.logo h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
 
 .logo p {
     font-size: 12px;
@@ -80,15 +77,27 @@ header {
     margin-top: 2px;
 }
 
+.pulse-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+}
+
 .header-stats {
     display: flex;
     gap: 32px;
     align-items: center;
 }
 
-.header-stat {
-    text-align: right;
-}
+.header-stat { text-align: right; }
 
 .header-stat .value {
     font-size: 28px;
@@ -110,24 +119,30 @@ header {
 .header-stat .value.accent { color: var(--accent); }
 .header-stat .value.purple { color: var(--purple); }
 
-.pulse-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--green);
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-    animation: pulse 2s ease-in-out infinite;
+main { padding: 32px 48px 48px; }
+
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+.filter-btn {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
 }
 
-main {
-    padding: 32px 48px 48px;
-}
+.filter-btn:hover { border-color: #4a4a60; color: var(--text); }
+.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
 .grid {
     display: grid;
@@ -146,47 +161,53 @@ main {
     overflow: hidden;
 }
 
-.card:hover {
-    border-color: #3a3a50;
-    transform: translateY(-1px);
-}
-
-.card.offline {
-    opacity: 0.45;
-}
+.card:hover { border-color: #3a3a50; transform: translateY(-1px); }
+.card.offline { opacity: 0.45; }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
 }
 
 .card-name {
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
     font-weight: 600;
-    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 180px;
+    max-width: 200px;
 }
 
-.tier-badge {
-    font-size: 10px;
+.type-badge {
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     padding: 3px 8px;
     border-radius: 4px;
     font-family: 'JetBrains Mono', monospace;
 }
 
-.tier-badge.high { background: rgba(168, 139, 250, 0.15); color: var(--purple); border: 1px solid rgba(168, 139, 250, 0.25); }
-.tier-badge.mid { background: rgba(100, 136, 255, 0.15); color: var(--accent); border: 1px solid rgba(100, 136, 255, 0.25); }
-.tier-badge.low { background: rgba(34, 211, 238, 0.15); color: var(--cyan); border: 1px solid rgba(34, 211, 238, 0.25); }
-.tier-badge.trade { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.25); }
+.type-badge.farming { background: rgba(74, 222, 128, 0.12); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.25); }
+.type-badge.training { background: rgba(251, 191, 36, 0.12); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.25); }
+
+.tier-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-left: 6px;
+}
+
+.tier-label.high { background: rgba(167, 139, 250, 0.12); color: var(--purple); border: 1px solid rgba(167, 139, 250, 0.25); }
+.tier-label.mid { background: rgba(100, 136, 255, 0.12); color: var(--accent); border: 1px solid rgba(100, 136, 255, 0.25); }
+.tier-label.low { background: rgba(34, 211, 238, 0.12); color: var(--cyan); border: 1px solid rgba(34, 211, 238, 0.25); }
 
 .card-status {
     font-size: 11px;
@@ -196,7 +217,6 @@ main {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.4;
 }
 
 .card-status.offline-text { color: var(--text-dim); }
@@ -226,18 +246,13 @@ main {
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
     font-weight: 600;
-    color: var(--text);
 }
 
 .stat .stat-value.gold { color: var(--amber); }
 
-.card-indicators {
-    margin-top: 10px;
-}
+.card-indicators { margin-top: 10px; }
 
-.indicator-group {
-    margin-bottom: 6px;
-}
+.indicator-group { margin-bottom: 6px; }
 
 .indicator-header {
     font-size: 10px;
@@ -251,11 +266,7 @@ main {
     border-bottom: none;
     display: flex;
     justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
 }
-
-.indicator-header:hover { background: rgba(251, 191, 36, 0.18); }
 
 .indicator-count {
     background: rgba(251, 191, 36, 0.25);
@@ -280,36 +291,15 @@ main {
     font-size: 10px;
     font-family: 'JetBrains Mono', monospace;
     padding: 3px 8px;
-    color: var(--text);
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid rgba(255,255,255,0.03);
 }
 
 .indicator-animal:last-child { border-bottom: none; }
-
 .indicator-animal .breed { color: var(--text); font-weight: 500; }
 .indicator-animal .coat { color: var(--cyan); }
 .indicator-animal .hair { color: var(--purple); }
-
-.empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--text-dim);
-}
-
-.empty-state h2 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text);
-}
-
-.empty-state p {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-}
 
 .last-update {
     font-size: 10px;
@@ -320,44 +310,15 @@ main {
     right: 12px;
 }
 
-.filter-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
     color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
 }
 
-.filter-btn:hover { border-color: #4a4a60; color: var(--text); }
-.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-.sort-btn {
-    margin-left: auto;
-    font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-}
-
-.sort-btn:hover { border-color: #4a4a60; color: var(--text); }
+.empty-state h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.empty-state p { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -367,8 +328,8 @@ main {
     <div class="logo">
         <div class="logo-icon">W</div>
         <div>
-            <h1>WHI Auto-Farm</h1>
-            <p><span class="pulse-dot"></span>dashboard live</p>
+            <h1>WHI Dashboard</h1>
+            <p><span class="pulse-dot"></span>live</p>
         </div>
     </div>
     <div class="header-stats">
@@ -382,11 +343,11 @@ main {
         </div>
         <div class="header-stat">
             <div class="value amber" id="totalCaught">0</div>
-            <div class="label">Total Caught</div>
+            <div class="label">Caught</div>
         </div>
         <div class="header-stat">
-            <div class="value purple" id="totalIndicators">0</div>
-            <div class="label">Indicators Held</div>
+            <div class="value purple" id="totalReceipts">0</div>
+            <div class="label">Receipts</div>
         </div>
     </div>
 </header>
@@ -396,16 +357,15 @@ main {
         <button class="filter-btn active" data-filter="all">All</button>
         <button class="filter-btn" data-filter="online">Online</button>
         <button class="filter-btn" data-filter="offline">Offline</button>
-        <button class="filter-btn" data-filter="high">High</button>
-        <button class="filter-btn" data-filter="mid">Mid</button>
-        <button class="filter-btn" data-filter="low">Low</button>
+        <button class="filter-btn" data-filter="farming">Farming</button>
+        <button class="filter-btn" data-filter="training">Training</button>
     </div>
     <div class="grid" id="grid"></div>
 </main>
 
 <script>
 const POLL_INTERVAL = 3000;
-const OFFLINE_THRESHOLD = 30000; // 30s no update = offline
+const OFFLINE_THRESHOLD = 30000;
 let currentFilter = "all";
 let accounts = {};
 
@@ -441,11 +401,14 @@ function isOnline(acc) {
     return acc.timestamp && (Date.now() - acc.timestamp) < OFFLINE_THRESHOLD;
 }
 
+function isFarming(acc) {
+    return acc.animalsCaptured !== undefined || acc.tier !== undefined;
+}
+
 function render() {
     const grid = document.getElementById("grid");
     const entries = Object.entries(accounts);
 
-    // Sort: online first, then alphabetical
     entries.sort((a, b) => {
         const aOn = isOnline(a[1]) ? 0 : 1;
         const bOn = isOnline(b[1]) ? 0 : 1;
@@ -453,13 +416,12 @@ function render() {
         return a[0].localeCompare(b[0]);
     });
 
-    // Filter
     const filtered = entries.filter(([name, acc]) => {
         if (currentFilter === "all") return true;
         if (currentFilter === "online") return isOnline(acc);
         if (currentFilter === "offline") return !isOnline(acc);
-        if (currentFilter === "high" || currentFilter === "mid" || currentFilter === "low")
-            return (acc.tier || "").toLowerCase() === currentFilter;
+        if (currentFilter === "farming") return isFarming(acc);
+        if (currentFilter === "training") return !isFarming(acc);
         return true;
     });
 
@@ -468,60 +430,76 @@ function render() {
         return;
     }
 
-    let totalCaught = 0;
-    let onlineCount = 0;
-    let totalIndicators = 0;
+    let totalCaught = 0, onlineCount = 0, totalReceipts = 0;
 
     entries.forEach(([, acc]) => {
         totalCaught += acc.animalsCaptured || 0;
+        totalReceipts += acc.trainingReceipts || 0;
         if (isOnline(acc)) onlineCount++;
-        const ind = acc.indicators || {};
-        for (const animals of Object.values(ind)) {
-            if (Array.isArray(animals)) totalIndicators += animals.length;
-        }
     });
 
     document.getElementById("totalAccounts").textContent = entries.length;
     document.getElementById("onlineCount").textContent = onlineCount;
     document.getElementById("totalCaught").textContent = totalCaught.toLocaleString();
-    document.getElementById("totalIndicators").textContent = totalIndicators.toLocaleString();
+    document.getElementById("totalReceipts").textContent = totalReceipts.toLocaleString();
 
     grid.innerHTML = filtered.map(([name, acc]) => {
         const online = isOnline(acc);
-        const tier = (acc.tier || "?").toLowerCase();
-        const indicators = acc.indicators || {};
+        const farming = isFarming(acc);
 
+        let badges = "";
+        if (farming) {
+            badges += `<span class="type-badge farming">Farm</span>`;
+            const tier = (acc.tier || "").toLowerCase();
+            if (tier) badges += `<span class="tier-label ${tier}">${acc.tier}</span>`;
+        } else {
+            badges += `<span class="type-badge training">Train</span>`;
+        }
+
+        let statsHtml = "";
+        if (farming) {
+            statsHtml = `
+                <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
+                <div class="stat"><div class="stat-label">Level</div><div class="stat-value">${acc.level || 0}</div></div>
+                <div class="stat"><div class="stat-label">Caught</div><div class="stat-value gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
+                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Lassos</div><div class="stat-value">${(acc.lassoCount || 0).toLocaleString()}</div></div>`;
+        } else {
+            statsHtml = `
+                <div class="stat"><div class="stat-label">Receipts</div><div class="stat-value gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
+                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>`;
+        }
+
+        // Indicators (farming accounts only)
         let indicatorHtml = "";
-        for (const [ind, animals] of Object.entries(indicators)) {
-            if (!Array.isArray(animals) || animals.length === 0) continue;
-            const rows = animals.map(a =>
-                `<div class="indicator-animal"><span class="breed">${a.breed}</span><span class="coat">${a.coat}</span><span class="hair">${a.maneColor}</span></div>`
-            ).join("");
-            indicatorHtml += `
-            <div class="indicator-group">
-                <div class="indicator-header">
-                    <span>${ind}</span>
-                    <span class="indicator-count">${animals.length}</span>
-                </div>
-                <div class="indicator-animals">${rows}</div>
-            </div>`;
+        if (farming && acc.indicators) {
+            for (const [ind, animals] of Object.entries(acc.indicators)) {
+                if (!Array.isArray(animals) || animals.length === 0) continue;
+                const rows = animals.map(a =>
+                    `<div class="indicator-animal"><span class="breed">${a.breed}</span><span class="coat">${a.coat}</span><span class="hair">${a.maneColor}</span></div>`
+                ).join("");
+                indicatorHtml += `
+                <div class="indicator-group">
+                    <div class="indicator-header">
+                        <span>${ind}</span>
+                        <span class="indicator-count">${animals.length}</span>
+                    </div>
+                    <div class="indicator-animals">${rows}</div>
+                </div>`;
+            }
         }
 
         return `
         <div class="card ${online ? "" : "offline"}">
             <div class="card-header">
                 <span class="card-name" title="${name}">${name}</span>
-                <span class="tier-badge ${tier}">${(acc.tier || "?").toUpperCase()}</span>
+                <div>${badges}</div>
             </div>
             <div class="card-status ${online ? "" : "offline-text"}">${online ? (acc.status || "Running") : "Offline"}</div>
-            <div class="card-stats">
-                <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
-                <div class="stat"><div class="stat-label">Level</div><div class="stat-value">${acc.level || 0}</div></div>
-                <div class="stat"><div class="stat-label">Caught</div><div class="stat-value gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
-                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-label">Lassos</div><div class="stat-value">${(acc.lassoCount || 0).toLocaleString()}</div></div>
-            </div>
+            <div class="card-stats">${statsHtml}</div>
             ${indicatorHtml ? `<div class="card-indicators">${indicatorHtml}</div>` : ""}
             <div class="last-update">${acc.timestamp ? timeAgo(acc.timestamp) : "never"}</div>
         </div>`;
@@ -531,13 +509,8 @@ function render() {
 async function poll() {
     try {
         const res = await fetch("/api/accounts");
-        if (res.ok) {
-            accounts = await res.json();
-            render();
-        }
-    } catch (e) {
-        // silent
-    }
+        if (res.ok) { accounts = await res.json(); render(); }
+    } catch (e) {}
 }
 
 poll();
