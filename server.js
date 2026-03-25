@@ -99,7 +99,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`[WHI Server] Running on http://localhost:${PORT}`);
-    console.log(`[WHI Server] Dashboard: http://localhost:${PORT}`);
-    console.log(`[WHI Server] Panel:     http://localhost:${PORT}/panel`);
+    console.log(`[WHI Dashboard] Initialized!`);
 });
