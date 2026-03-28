@@ -460,17 +460,17 @@ function render() {
         if (farming) {
             statsHtml = `
                 <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
-                <div class="stat"><div class="stat-label">Level</div><div class="stat-value">${acc.level || 0}</div></div>
-                <div class="stat"><div class="stat-label">Caught</div><div class="stat-value gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
                 <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
+                <div class="stat"><div class="stat-label">Level</div><div class="stat-value">${acc.level || 0}</div></div>
                 <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Caught</div><div class="stat-value gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
                 <div class="stat"><div class="stat-label">Lassos</div><div class="stat-value">${(acc.lassoCount || 0).toLocaleString()}</div></div>`;
         } else {
             statsHtml = `
-                <div class="stat"><div class="stat-label">Receipts</div><div class="stat-value gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
                 <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
-                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>`;
+                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
+                <div class="stat"><div class="stat-label">Receipts</div><div class="stat-value gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>`;
         }
 
         // Indicators (farming accounts only)
