@@ -1,143 +1,175 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WHI Control Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-    --bg: #06060f;
-    --surface: #0d0d1a;
-    --surface2: #131322;
-    --border: rgba(255,255,255,0.06);
-    --border-hover: rgba(255,255,255,0.12);
-    --text: #eeeef5;
-    --text-dim: #55556a;
-    --text-mid: #9090a8;
-    --accent: #6c6af7;
-    --accent-glow: rgba(108,106,247,0.2);
-    --green: #00e5a0;
-    --green-glow: rgba(0,229,160,0.15);
-    --red: #ff4f6a;
-    --radius: 12px;
+[data-theme="dark"] {
+    --bg:           #1c1c1e;
+    --surface:      rgba(44,44,46,0.98);
+    --surface2:     rgba(58,58,60,0.8);
+    --surface3:     rgba(72,72,74,0.6);
+    --border:       rgba(255,255,255,0.10);
+    --border-focus: rgba(10,132,255,0.6);
+    --text:         #f5f5f7;
+    --text2:        rgba(245,245,247,0.55);
+    --text3:        rgba(245,245,247,0.28);
+    --blue:         #0a84ff;
+    --blue-bg:      rgba(10,132,255,0.15);
+    --green:        #30d158;
+    --green-bg:     rgba(48,209,88,0.12);
+    --green-border: rgba(48,209,88,0.25);
+    --red:          #ff453a;
+    --red-bg:       rgba(255,69,58,0.12);
+    --red-border:   rgba(255,69,58,0.25);
+    --shadow:       0 4px 20px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.25);
+    --blur-bg:      rgba(44,44,46,0.88);
 }
+
+[data-theme="light"] {
+    --bg:           #f2f2f7;
+    --surface:      rgba(255,255,255,0.98);
+    --surface2:     rgba(242,242,247,0.9);
+    --surface3:     rgba(229,229,234,0.7);
+    --border:       rgba(0,0,0,0.06);
+    --border-focus: rgba(0,122,255,0.5);
+    --text:         #1d1d1f;
+    --text2:        rgba(29,29,31,0.5);
+    --text3:        rgba(29,29,31,0.28);
+    --blue:         #007aff;
+    --blue-bg:      rgba(0,122,255,0.1);
+    --green:        #34c759;
+    --green-bg:     rgba(52,199,89,0.1);
+    --green-border: rgba(52,199,89,0.25);
+    --red:          #ff3b30;
+    --red-bg:       rgba(255,59,48,0.1);
+    --red-border:   rgba(255,59,48,0.25);
+    --shadow:       0 4px 20px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06);
+    --blur-bg:      rgba(255,255,255,0.85);
+}
+
+html { -webkit-font-smoothing: antialiased; }
 
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'DM Mono', monospace;
+    font-family: -apple-system, "SF Pro Display", "SF Pro Text", BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.35s, color 0.35s;
+}
+
+/* ── NAV ── */
+nav {
+    background: var(--blur-bg);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    transition: background 0.35s;
+}
+
+.nav-logo { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+
+.nav-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 7px;
+    transition: background 0.15s;
+}
+.nav-link:hover { background: var(--blue-bg); }
+
+.theme-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 15px;
+    display: grid;
+    place-items: center;
+    transition: background 0.2s, transform 0.15s;
+}
+.theme-btn:hover { background: var(--surface3); transform: scale(1.05); }
+.theme-btn:active { transform: scale(0.95); }
+
+/* ── BODY ── */
+.body {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(108,106,247,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(108,106,247,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-}
-
-body::after {
-    content: '';
-    position: fixed;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 700px;
-    height: 400px;
-    background: radial-gradient(ellipse, rgba(108,106,247,0.07) 0%, transparent 70%);
-    pointer-events: none;
-}
-
+/* ── PANEL ── */
 .panel {
-    position: relative;
-    z-index: 1;
     width: 440px;
     max-width: 100%;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+    box-shadow: var(--shadow);
+    animation: panel-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    transition: background 0.35s, border-color 0.35s;
 }
 
-/* Top accent bar */
-.panel::before {
-    content: '';
-    display: block;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), #9c6af7, transparent);
+@keyframes panel-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.panel-inner { padding: 32px 36px 36px; }
+.panel-top { padding: 28px 28px 0; }
 
 /* Header */
-.panel-header {
-    margin-bottom: 32px;
-}
+.panel-header { margin-bottom: 28px; }
 
 .panel-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 6px;
-}
-
-.panel-icon {
-    width: 34px;
-    height: 34px;
-    background: linear-gradient(135deg, var(--accent), #9c6af7);
-    border-radius: 9px;
-    display: grid;
-    place-items: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 15px;
-    color: #fff;
-    box-shadow: 0 0 20px rgba(108,106,247,0.3);
-    flex-shrink: 0;
-}
-
-.panel-title h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
     font-size: 22px;
-    letter-spacing: -0.3px;
-    background: linear-gradient(135deg, var(--text), var(--text-mid));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
 }
 
 .panel-sub {
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 400;
+}
+
+/* Divider */
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 28px;
+}
+
+/* Sections */
+.section { padding: 20px 28px 0; }
+
+.section-title {
     font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.3px;
-    padding-left: 46px;
-}
-
-/* Section label */
-.section-lbl {
-    font-size: 9px;
-    font-weight: 500;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
+    letter-spacing: 0.8px;
+    color: var(--text3);
     margin-bottom: 10px;
-    margin-top: 24px;
 }
-
-.section-lbl:first-of-type { margin-top: 0; }
 
 /* Toggle row */
 .toggle-row {
@@ -146,300 +178,318 @@ body::after {
     justify-content: space-between;
     background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 14px 16px;
-    transition: border-color 0.2s;
+    transition: background 0.2s, border-color 0.2s;
 }
 
-.toggle-row:hover { border-color: var(--border-hover); }
+.toggle-row:hover { border-color: rgba(255,255,255,0.14); }
+[data-theme="light"] .toggle-row:hover { border-color: rgba(0,0,0,0.12); }
 
-.toggle-label {
-    font-size: 13px;
+.toggle-name {
+    font-size: 15px;
     font-weight: 500;
-    color: var(--text);
+    letter-spacing: -0.2px;
 }
 
-.toggle-wrap {
-    position: relative;
-    width: 44px;
-    height: 24px;
-    flex-shrink: 0;
-}
+/* iOS-style toggle */
+.ios-toggle { position: relative; width: 51px; height: 31px; flex-shrink: 0; }
 
-.toggle-input {
+.ios-toggle input {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.toggle-track {
+.ios-track {
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0.08);
-    border-radius: 12px;
+    border-radius: 15.5px;
+    background: var(--surface3);
     cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s;
-    border: 1px solid var(--border);
+    transition: background 0.25s;
 }
 
-.toggle-track::after {
+.ios-track::after {
     content: '';
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 27px;
+    height: 27px;
     border-radius: 50%;
-    background: var(--text-dim);
+    background: #fff;
     top: 2px;
     left: 2px;
-    transition: transform 0.2s, background 0.2s;
+    transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-.toggle-input:checked + .toggle-track {
+.ios-toggle input:checked + .ios-track {
     background: var(--green);
-    box-shadow: 0 0 12px var(--green-glow);
-    border-color: transparent;
 }
 
-.toggle-input:checked + .toggle-track::after {
+.ios-toggle input:checked + .ios-track::after {
     transform: translateX(20px);
-    background: #fff;
 }
 
-/* Input row */
-.input-field {
+/* Input */
+.input-group {
     background: var(--surface2);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.input-field:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-glow);
+.input-group:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(10,132,255,0.12);
 }
 
-.input-field label {
+[data-theme="light"] .input-group:focus-within {
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+}
+
+.input-label {
     display: block;
-    font-size: 9px;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--text-dim);
+    letter-spacing: 0.6px;
+    color: var(--text3);
     padding: 12px 16px 0;
 }
 
-.input-field input {
+.input-group input {
     width: 100%;
     background: transparent;
     border: none;
     outline: none;
-    padding: 6px 16px 12px;
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
+    padding: 5px 16px 13px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 400;
     color: var(--text);
-    caret-color: var(--accent);
+    caret-color: var(--blue);
 }
 
-.input-field input::placeholder { color: var(--text-dim); }
+.input-group input::placeholder { color: var(--text3); }
 
 /* Save button */
+.save-wrap { padding: 20px 28px 24px; }
+
 .save-btn {
     width: 100%;
-    margin-top: 24px;
-    padding: 14px;
-    border-radius: 10px;
+    padding: 15px;
+    border-radius: 12px;
     border: none;
-    background: var(--accent);
+    background: var(--blue);
     color: #fff;
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
     cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s;
-    box-shadow: 0 4px 24px rgba(108,106,247,0.3);
+    transition: opacity 0.15s, transform 0.1s;
 }
 
-.save-btn:hover { opacity: 0.92; box-shadow: 0 4px 32px rgba(108,106,247,0.45); }
-.save-btn:active { transform: scale(0.98); }
+.save-btn:hover   { opacity: 0.88; }
+.save-btn:active  { transform: scale(0.98); opacity: 0.8; }
 
-/* Status bar */
-.status-bar {
-    margin-top: 14px;
-    padding: 11px 16px;
-    border-radius: 8px;
-    font-size: 11px;
+/* Toast */
+.toast {
+    margin: 0 28px 20px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
     text-align: center;
     display: none;
-    animation: fade-in 0.2s ease;
+    animation: toast-in 0.25s ease;
 }
 
-@keyframes fade-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
-
-.status-bar.success {
-    display: block;
-    background: rgba(0,229,160,0.08);
-    color: var(--green);
-    border: 1px solid rgba(0,229,160,0.2);
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-.status-bar.error {
-    display: block;
-    background: rgba(255,79,106,0.08);
-    color: var(--red);
-    border: 1px solid rgba(255,79,106,0.2);
-}
-
-/* Divider */
-.divider {
-    height: 1px;
-    background: var(--border);
-    margin: 28px 0;
-}
+.toast.ok  { display: block; background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.toast.err { display: block; background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
 
 /* Live config */
-.live-config {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
+.live-section {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 20px 28px;
+    transition: background 0.35s;
 }
+
+.live-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text3);
+    margin-bottom: 14px;
+}
+
+.live-rows { display: flex; flex-direction: column; gap: 10px; }
 
 .live-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 12px;
-    padding: 4px 0;
+    font-size: 14px;
 }
 
-.live-row + .live-row { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; }
-
-.live-key { color: var(--text-dim); }
-
-.live-val { font-weight: 500; }
+.live-key { color: var(--text2); font-weight: 400; }
+.live-val { font-weight: 600; }
 .live-val.on  { color: var(--green); }
-.live-val.off { color: var(--red); }
+.live-val.off { color: var(--text3); }
 
-/* Online count */
-.online-pill {
-    margin-top: 14px;
+.online-row {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 10px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--text-dim);
-    padding: 10px;
-    background: rgba(0,229,160,0.04);
-    border: 1px solid rgba(0,229,160,0.08);
-    border-radius: 8px;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text2);
 }
 
-.online-pill span { color: var(--green); font-weight: 500; }
+.online-row strong { color: var(--green); font-weight: 600; }
 </style>
 </head>
 <body>
 
-<div class="panel">
-    <div class="panel-inner">
-        <div class="panel-header">
-            <div class="panel-title">
-                <div class="panel-icon">W</div>
-                <h1>Control Panel</h1>
+<nav>
+    <span class="nav-logo">WHI</span>
+    <div class="nav-right">
+        <a href="/" class="nav-link">← Dashboard</a>
+        <button class="theme-btn" id="themeBtn">🌙</button>
+    </div>
+</nav>
+
+<div class="body">
+    <div class="panel">
+        <div class="panel-top">
+            <div class="panel-header">
+                <div class="panel-title">Control Panel</div>
+                <div class="panel-sub">Changes push to all accounts within ~10 seconds</div>
             </div>
-            <div class="panel-sub">changes apply to all accounts within ~10 seconds</div>
-        </div>
 
-        <div class="section-lbl">Trade Mode</div>
-        <div class="toggle-row">
-            <span class="toggle-label">Enabled</span>
-            <label class="toggle-wrap">
-                <input type="checkbox" class="toggle-input" id="tradeToggle">
-                <span class="toggle-track"></span>
-            </label>
-        </div>
+            <div class="section">
+                <div class="section-title">Trade Mode</div>
+                <div class="toggle-row">
+                    <span class="toggle-name">Enabled</span>
+                    <label class="ios-toggle">
+                        <input type="checkbox" id="tradeToggle">
+                        <span class="ios-track"></span>
+                    </label>
+                </div>
+            </div>
 
-        <div class="section-lbl">Target Player</div>
-        <div class="input-field">
-            <label for="targetPlayer">Username</label>
-            <input type="text" id="targetPlayer" placeholder="Enter username...">
+            <div class="section" style="padding-bottom:24px">
+                <div class="section-title" style="margin-top:20px">Target Player</div>
+                <div class="input-group">
+                    <label class="input-label" for="targetPlayer">Username</label>
+                    <input type="text" id="targetPlayer" placeholder="Enter username…" autocomplete="off" autocorrect="off" autocapitalize="off">
+                </div>
+            </div>
         </div>
-
-        <button class="save-btn" onclick="saveConfig()">Save & Push to All Accounts</button>
-        <div class="status-bar" id="statusBar"></div>
 
         <div class="divider"></div>
 
-        <div class="section-lbl">Live Config</div>
-        <div class="live-config">
-            <div class="live-row">
-                <span class="live-key">Trade</span>
-                <span class="live-val off" id="liveTradeEnabled">OFF</span>
-            </div>
-            <div class="live-row">
-                <span class="live-key">Target</span>
-                <span class="live-val" id="liveTargetPlayer">—</span>
-            </div>
+        <div class="save-wrap">
+            <button class="save-btn" onclick="saveConfig()">Save & Push to All Accounts</button>
         </div>
 
-        <div class="online-pill" id="onlineCount">
-            <span id="onlineNum">0</span> / <span id="totalNum">0</span> accounts online
+        <div class="toast" id="toast"></div>
+
+        <div class="live-section">
+            <div class="live-title">Live Config</div>
+            <div class="live-rows">
+                <div class="live-row">
+                    <span class="live-key">Trade mode</span>
+                    <span class="live-val off" id="liveEnabled">Off</span>
+                </div>
+                <div class="live-row">
+                    <span class="live-key">Target player</span>
+                    <span class="live-val" id="liveTarget">—</span>
+                </div>
+            </div>
+            <div class="online-row">
+                <span>Accounts online</span>
+                <span><strong id="onlineNum">0</strong> / <span id="totalNum">0</span></span>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+// Theme
+const html = document.documentElement;
+const themeBtn = document.getElementById("themeBtn");
+const saved = localStorage.getItem("whi-theme") || "dark";
+html.setAttribute("data-theme", saved);
+themeBtn.textContent = saved === "dark" ? "☀️" : "🌙";
+
+themeBtn.addEventListener("click", () => {
+    const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    html.setAttribute("data-theme", next);
+    themeBtn.textContent = next === "dark" ? "☀️" : "🌙";
+    localStorage.setItem("whi-theme", next);
+});
+
 async function saveConfig() {
     const enabled = document.getElementById("tradeToggle").checked;
     const targetPlayer = document.getElementById("targetPlayer").value.trim();
-    const bar = document.getElementById("statusBar");
+    const toast = document.getElementById("toast");
 
     try {
-        const res = await fetch("/api/config", {
+        const r = await fetch("/api/config", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ trade: { enabled, targetPlayer } })
         });
-
-        if (res.ok) {
-            bar.className = "status-bar success";
-            bar.textContent = "Pushed — accounts will pick it up within 10 seconds";
+        if (r.ok) {
+            toast.className = "toast ok";
+            toast.textContent = "Saved — accounts will pick up changes within 10 seconds";
             pollConfig();
         } else {
-            bar.className = "status-bar error";
-            bar.textContent = "Failed to save config";
+            toast.className = "toast err";
+            toast.textContent = "Failed to save config";
         }
     } catch(e) {
-        bar.className = "status-bar error";
-        bar.textContent = "Network error";
+        toast.className = "toast err";
+        toast.textContent = "Network error";
     }
 
-    setTimeout(() => { bar.className = "status-bar"; }, 5000);
+    setTimeout(() => { toast.className = "toast"; }, 4000);
 }
 
 async function pollConfig() {
     try {
-        const res = await fetch("/api/config");
-        if (!res.ok) return;
-        const cfg = await res.json();
+        const r = await fetch("/api/config");
+        if (!r.ok) return;
+        const cfg = await r.json();
 
         document.getElementById("tradeToggle").checked = cfg.trade.enabled;
         document.getElementById("targetPlayer").value = cfg.trade.targetPlayer || "";
 
-        const el = document.getElementById("liveTradeEnabled");
-        el.textContent = cfg.trade.enabled ? "ON" : "OFF";
+        const el = document.getElementById("liveEnabled");
+        el.textContent = cfg.trade.enabled ? "On" : "Off";
         el.className = "live-val " + (cfg.trade.enabled ? "on" : "off");
-        document.getElementById("liveTargetPlayer").textContent = cfg.trade.targetPlayer || "—";
+        document.getElementById("liveTarget").textContent = cfg.trade.targetPlayer || "—";
     } catch(e) {}
 }
 
 async function pollOnline() {
     try {
-        const res = await fetch("/api/accounts");
-        if (!res.ok) return;
-        const accs = await res.json();
+        const r = await fetch("/api/accounts");
+        if (!r.ok) return;
+        const accs = await r.json();
         const total = Object.keys(accs).length;
         const online = Object.values(accs).filter(a => a.timestamp && (Date.now() - a.timestamp) < 30000).length;
         document.getElementById("onlineNum").textContent = online;
