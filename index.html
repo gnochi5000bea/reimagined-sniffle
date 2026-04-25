@@ -4,390 +4,529 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WHI Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-    --bg: #08080c;
-    --surface: #111118;
-    --surface2: #1a1a24;
-    --border: #2a2a3a;
-    --text: #e0e0ec;
-    --text-dim: #6a6a80;
-    --accent: #6488ff;
-    --green: #4ade80;
-    --amber: #fbbf24;
-    --red: #f87171;
+    --bg: #06060f;
+    --surface: #0d0d1a;
+    --surface2: #13132200;
+    --border: rgba(255,255,255,0.06);
+    --border-hover: rgba(255,255,255,0.12);
+    --text: #eeeef5;
+    --text-dim: #55556a;
+    --text-mid: #9090a8;
+    --accent: #6c6af7;
+    --accent-glow: rgba(108,106,247,0.15);
+    --green: #00e5a0;
+    --green-glow: rgba(0,229,160,0.12);
+    --amber: #ffb547;
+    --amber-glow: rgba(255,181,71,0.12);
+    --red: #ff4f6a;
     --purple: #a78bfa;
-    --cyan: #22d3ee;
+    --cyan: #22d9ee;
+    --radius: 12px;
 }
+
+html { scrollbar-width: thin; scrollbar-color: #1e1e30 transparent; }
 
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'DM Mono', monospace;
     min-height: 100vh;
     overflow-x: hidden;
 }
 
-.noise {
+/* Grid background */
+body::before {
+    content: '';
     position: fixed;
     inset: 0;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-image:
+        linear-gradient(rgba(108,106,247,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108,106,247,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 0;
 }
 
+/* Radial glow top */
+body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(108,106,247,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; }
+
+/* ── HEADER ── */
 header {
-    padding: 40px 48px 0;
+    padding: 48px 52px 36px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 32px;
     flex-wrap: wrap;
-    gap: 16px;
+    border-bottom: 1px solid var(--border);
 }
 
-.logo {
+.brand {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.brand-top {
     display: flex;
     align-items: center;
     gap: 14px;
 }
 
-.logo-icon {
-    width: 42px;
-    height: 42px;
-    background: linear-gradient(135deg, var(--accent), var(--amber));
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--accent), #9c6af7);
     border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 17px;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(108,106,247,0.3);
+}
+
+.brand h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--text) 40%, var(--text-mid));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.live-badge {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: 800;
-    color: #fff;
-}
-
-.logo h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-
-.logo p {
-    font-size: 12px;
+    gap: 7px;
+    font-size: 11px;
     color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
-    margin-top: 2px;
+    letter-spacing: 0.5px;
 }
 
-.pulse-dot {
-    width: 8px; height: 8px;
+.live-dot {
+    width: 7px;
+    height: 7px;
     background: var(--green);
     border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 8px var(--green);
+    animation: live-pulse 2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
+    50% { opacity: 0.5; box-shadow: 0 0 3px var(--green); }
 }
 
 .header-stats {
     display: flex;
-    gap: 32px;
-    align-items: center;
+    gap: 2px;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
 }
 
-.header-stat { text-align: right; }
+.hstat {
+    padding: 16px 28px;
+    text-align: center;
+    position: relative;
+}
 
-.header-stat .value {
-    font-size: 28px;
+.hstat + .hstat::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: var(--border);
+}
+
+.hstat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
     font-weight: 800;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: -1px;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 4px;
 }
 
-.header-stat .label {
-    font-size: 11px;
+.hstat-lbl {
+    font-size: 10px;
     color: var(--text-dim);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-weight: 500;
 }
 
-.header-stat .value.green { color: var(--green); }
-.header-stat .value.amber { color: var(--amber); }
-.header-stat .value.accent { color: var(--accent); }
-.header-stat .value.purple { color: var(--purple); }
+.hstat-val.c-accent { color: var(--accent); }
+.hstat-val.c-green { color: var(--green); }
+.hstat-val.c-amber { color: var(--amber); }
+.hstat-val.c-purple { color: var(--purple); }
 
-main { padding: 32px 48px 48px; }
+/* ── MAIN ── */
+main { padding: 32px 52px 60px; }
 
-.filter-bar {
+/* ── FILTERS ── */
+.toolbar {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filters {
+    display: flex;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
 .filter-btn {
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 6px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 999px;
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text-dim);
     cursor: pointer;
     transition: all 0.15s;
+    letter-spacing: 0.3px;
 }
 
-.filter-btn:hover { border-color: #4a4a60; color: var(--text); }
-.filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.filter-btn:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+}
 
+.filter-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(108,106,247,0.25);
+}
+
+.count-badge {
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.3px;
+}
+
+/* ── GRID ── */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
     align-items: start;
 }
 
+/* ── CARD ── */
 .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 20px 28px;
-    transition: border-color 0.2s, transform 0.15s;
+    border-radius: var(--radius);
+    padding: 22px;
     position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    animation: card-in 0.3s ease both;
     overflow: hidden;
 }
 
-.card:hover { border-color: #3a3a50; transform: translateY(-1px); }
-.card.offline { opacity: 0.45; }
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.card-name {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-}
-
-.type-badge {
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-}
-
-.type-badge.farming { background: rgba(74, 222, 128, 0.12); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.25); }
-.type-badge.training { background: rgba(251, 191, 36, 0.12); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.25); }
-
-.tier-label {
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    margin-left: 6px;
-}
-
-.tier-label.high { background: rgba(167, 139, 250, 0.12); color: var(--purple); border: 1px solid rgba(167, 139, 250, 0.25); }
-.tier-label.mid { background: rgba(100, 136, 255, 0.12); color: var(--accent); border: 1px solid rgba(100, 136, 255, 0.25); }
-.tier-label.low { background: rgba(34, 211, 238, 0.12); color: var(--cyan); border: 1px solid rgba(34, 211, 238, 0.25); }
-
-.card-status {
-    font-size: 11px;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--green);
-    margin-bottom: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.card-status.offline-text { color: var(--text-dim); }
-
-.card-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
-.stat {
-    background: var(--surface2);
-    border-radius: 6px;
-    padding: 8px 10px;
-}
-
-.stat .stat-label {
-    font-size: 9px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-weight: 600;
-    margin-bottom: 2px;
-}
-
-.stat .stat-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.stat .stat-value.gold { color: var(--amber); }
-
-.card-indicators { margin-top: 10px; }
-
-.indicator-group { margin-bottom: 6px; }
-
-.indicator-header {
-    font-size: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 4px 4px 0 0;
-    background: rgba(251, 191, 36, 0.12);
-    color: var(--amber);
-    border: 1px solid rgba(251, 191, 36, 0.2);
-    border-bottom: none;
-    display: flex;
-    justify-content: space-between;
-}
-
-.indicator-count {
-    background: rgba(251, 191, 36, 0.25);
-    padding: 0 6px;
-    border-radius: 3px;
-    font-size: 9px;
-}
-
-.indicator-animals {
-    background: var(--surface2);
-    border: 1px solid rgba(251, 191, 36, 0.12);
-    border-radius: 0 0 4px 4px;
-    max-height: 120px;
-    overflow-y: auto;
-}
-
-.indicator-animals::-webkit-scrollbar { width: 4px; }
-.indicator-animals::-webkit-scrollbar-track { background: transparent; }
-.indicator-animals::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.3); border-radius: 2px; }
-
-.indicator-animal {
-    font-size: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    padding: 3px 8px;
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-}
-
-.indicator-animal:last-child { border-bottom: none; }
-.indicator-animal .breed { color: var(--text); font-weight: 500; }
-.indicator-animal .coat { color: var(--cyan); }
-.indicator-animal .hair { color: var(--purple); }
-
-.last-update {
-    font-size: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-dim);
+.card::before {
+    content: '';
     position: absolute;
-    bottom: 8px;
-    right: 12px;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.5;
+    transition: opacity 0.2s;
 }
 
+.card.online::before { background: var(--green); opacity: 0.8; }
+.card.offline::before { background: var(--text-dim); opacity: 0.4; }
+.card.farming::before { background: var(--green); }
+.card.training::before { background: var(--amber); }
+
+.card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--border-hover);
+    transform: translateY(-2px);
+}
+
+.card.offline { opacity: 0.4; }
+
+@keyframes card-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Remove button */
 .remove-btn {
     position: absolute;
-    top: 10px;
-    right: 12px;
-    width: 22px;
-    height: 22px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
+    top: 14px;
+    right: 14px;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid transparent;
     background: transparent;
     color: var(--text-dim);
-    font-size: 12px;
-    line-height: 1;
+    font-size: 13px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     opacity: 0;
-    transition: opacity 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
+    transition: all 0.15s;
+    line-height: 1;
 }
 
 .card:hover .remove-btn { opacity: 1; }
-.remove-btn:hover { background: rgba(248, 113, 113, 0.15); color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
-
-.empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--text-dim);
+.remove-btn:hover {
+    background: rgba(255,79,106,0.15);
+    border-color: rgba(255,79,106,0.3);
+    color: var(--red);
 }
 
-.empty-state h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
-.empty-state p { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+/* Card header */
+.card-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 80px);
+    margin-bottom: 4px;
+}
+
+.card-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding: 3px 9px;
+    border-radius: 4px;
+}
+
+.badge-farm  { background: rgba(0,229,160,0.1); color: var(--green); border: 1px solid rgba(0,229,160,0.2); }
+.badge-train { background: rgba(255,181,71,0.1); color: var(--amber); border: 1px solid rgba(255,181,71,0.2); }
+.badge-online  { background: rgba(0,229,160,0.08); color: var(--green); border: 1px solid rgba(0,229,160,0.15); }
+.badge-offline { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border); }
+.badge-tier { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+
+/* Status line */
+.card-status {
+    font-size: 11px;
+    color: var(--green);
+    margin-bottom: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.9;
+}
+
+.card-status.dim { color: var(--text-dim); }
+
+/* Stats grid */
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.stat {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.stat-lbl {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+}
+
+.stat-val {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stat-val.gold { color: var(--amber); }
+
+/* Indicators */
+.indicators { margin-top: 4px; }
+
+.ind-group { margin-bottom: 6px; }
+
+.ind-head {
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--amber);
+    padding: 4px 10px;
+    background: rgba(255,181,71,0.08);
+    border: 1px solid rgba(255,181,71,0.15);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ind-count {
+    background: rgba(255,181,71,0.2);
+    padding: 0 6px;
+    border-radius: 3px;
+}
+
+.ind-animals {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,181,71,0.1);
+    border-radius: 0 0 6px 6px;
+    max-height: 110px;
+    overflow-y: auto;
+}
+
+.ind-row {
+    font-size: 10px;
+    padding: 4px 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.ind-row:last-child { border-bottom: none; }
+.ind-row .breed { color: var(--text); }
+.ind-row .coat  { color: var(--cyan); }
+.ind-row .hair  { color: var(--purple); }
+
+/* Timestamp */
+.card-ts {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ── EMPTY ── */
+.empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.empty h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.empty p { color: var(--text-dim); font-size: 13px; }
 </style>
 </head>
 <body>
-<div class="noise"></div>
+<div class="wrap">
 
 <header>
-    <div class="logo">
-        <div class="logo-icon">W</div>
-        <div>
+    <div class="brand">
+        <div class="brand-top">
+            <div class="brand-icon">W</div>
             <h1>WHI Dashboard</h1>
-            <p><span class="pulse-dot"></span>live</p>
+        </div>
+        <div class="live-badge">
+            <span class="live-dot"></span>
+            live · updates every 3s
         </div>
     </div>
+
     <div class="header-stats">
-        <div class="header-stat">
-            <div class="value accent" id="totalAccounts">0</div>
-            <div class="label">Accounts</div>
+        <div class="hstat">
+            <div class="hstat-val c-accent" id="totalAccounts">0</div>
+            <div class="hstat-lbl">Accounts</div>
         </div>
-        <div class="header-stat">
-            <div class="value green" id="onlineCount">0</div>
-            <div class="label">Online</div>
+        <div class="hstat">
+            <div class="hstat-val c-green" id="onlineCount">0</div>
+            <div class="hstat-lbl">Online</div>
         </div>
-        <div class="header-stat">
-            <div class="value amber" id="totalCaught">0</div>
-            <div class="label">Caught</div>
+        <div class="hstat">
+            <div class="hstat-val c-amber" id="totalCaught">0</div>
+            <div class="hstat-lbl">Caught</div>
         </div>
-        <div class="header-stat">
-            <div class="value purple" id="totalReceipts">0</div>
-            <div class="label">Receipts</div>
+        <div class="hstat">
+            <div class="hstat-val c-purple" id="totalReceipts">0</div>
+            <div class="hstat-lbl">Receipts</div>
         </div>
     </div>
 </header>
 
 <main>
-    <div class="filter-bar">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="online">Online</button>
-        <button class="filter-btn" data-filter="offline">Offline</button>
-        <button class="filter-btn" data-filter="farming">Farming</button>
-        <button class="filter-btn" data-filter="training">Training</button>
+    <div class="toolbar">
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="online">Online</button>
+            <button class="filter-btn" data-filter="offline">Offline</button>
+            <button class="filter-btn" data-filter="farming">Farming</button>
+            <button class="filter-btn" data-filter="training">Training</button>
+        </div>
+        <span class="count-badge" id="countBadge"></span>
     </div>
+
     <div class="grid" id="grid"></div>
 </main>
 
+</div>
 <script>
-const POLL_INTERVAL = 3000;
 const OFFLINE_THRESHOLD = 30000;
 let currentFilter = "all";
 let accounts = {};
@@ -402,30 +541,30 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
 });
 
 function timeAgo(ts) {
-    const diff = Math.floor((Date.now() - ts) / 1000);
-    if (diff < 5) return "just now";
-    if (diff < 60) return diff + "s ago";
-    if (diff < 3600) return Math.floor(diff / 60) + "m ago";
-    if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
-    return Math.floor(diff / 86400) + "d ago";
+    const d = Math.floor((Date.now() - ts) / 1000);
+    if (d < 5) return "just now";
+    if (d < 60) return d + "s ago";
+    if (d < 3600) return Math.floor(d / 60) + "m ago";
+    return Math.floor(d / 3600) + "h ago";
 }
 
-function formatUptime(seconds) {
-    if (!seconds || seconds <= 0) return "0s";
-    const d = Math.floor(seconds / 86400);
-    const h = Math.floor((seconds % 86400) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
+function formatUptime(s) {
+    if (!s || s <= 0) return "0s";
+    const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
     if (d > 0) return d + "d " + h + "h";
     if (h > 0) return h + "h " + m + "m";
     return m + "m";
 }
 
-function isOnline(acc) {
-    return acc.timestamp && (Date.now() - acc.timestamp) < OFFLINE_THRESHOLD;
-}
+function isOnline(acc) { return acc.timestamp && (Date.now() - acc.timestamp) < OFFLINE_THRESHOLD; }
+function isFarming(acc) { return acc.animalsCaptured !== undefined || acc.tier !== undefined; }
 
-function isFarming(acc) {
-    return acc.animalsCaptured !== undefined || acc.tier !== undefined;
+async function removeAccount(username) {
+    try {
+        await fetch(`/api/accounts/${encodeURIComponent(username)}`, { method: "DELETE" });
+        delete accounts[username];
+        render();
+    } catch(e) {}
 }
 
 function render() {
@@ -433,13 +572,11 @@ function render() {
     const entries = Object.entries(accounts);
 
     entries.sort((a, b) => {
-        const aOn = isOnline(a[1]) ? 0 : 1;
-        const bOn = isOnline(b[1]) ? 0 : 1;
-        if (aOn !== bOn) return aOn - bOn;
-        return a[0].localeCompare(b[0]);
+        const aOn = isOnline(a[1]) ? 0 : 1, bOn = isOnline(b[1]) ? 0 : 1;
+        return aOn !== bOn ? aOn - bOn : a[0].localeCompare(b[0]);
     });
 
-    const filtered = entries.filter(([name, acc]) => {
+    const filtered = entries.filter(([, acc]) => {
         if (currentFilter === "all") return true;
         if (currentFilter === "online") return isOnline(acc);
         if (currentFilter === "offline") return !isOnline(acc);
@@ -448,103 +585,99 @@ function render() {
         return true;
     });
 
-    if (filtered.length === 0) {
-        grid.innerHTML = `<div class="empty-state"><h2>No accounts</h2><p>waiting for status reports...</p></div>`;
-        return;
-    }
-
-    let totalCaught = 0, onlineCount = 0, totalReceipts = 0;
-
+    let caught = 0, receipts = 0, online = 0;
     entries.forEach(([, acc]) => {
-        totalCaught += acc.animalsCaptured || 0;
-        totalReceipts += acc.trainingReceipts || 0;
-        if (isOnline(acc)) onlineCount++;
+        caught += acc.animalsCaptured || 0;
+        receipts += acc.trainingReceipts || 0;
+        if (isOnline(acc)) online++;
     });
 
     document.getElementById("totalAccounts").textContent = entries.length;
-    document.getElementById("onlineCount").textContent = onlineCount;
-    document.getElementById("totalCaught").textContent = totalCaught.toLocaleString();
-    document.getElementById("totalReceipts").textContent = totalReceipts.toLocaleString();
+    document.getElementById("onlineCount").textContent = online;
+    document.getElementById("totalCaught").textContent = caught.toLocaleString();
+    document.getElementById("totalReceipts").textContent = receipts.toLocaleString();
+    document.getElementById("countBadge").textContent = filtered.length + " account" + (filtered.length !== 1 ? "s" : "");
 
-    grid.innerHTML = filtered.map(([name, acc]) => {
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty"><h2>No accounts</h2><p>Waiting for status reports...</p></div>`;
+        return;
+    }
+
+    grid.innerHTML = filtered.map(([name, acc], i) => {
         const online = isOnline(acc);
         const farming = isFarming(acc);
 
-        let badges = "";
+        const typeBadge = farming
+            ? `<span class="badge badge-farm">Farm</span>`
+            : `<span class="badge badge-train">Train</span>`;
+        const statusBadge = online
+            ? `<span class="badge badge-online">● Online</span>`
+            : `<span class="badge badge-offline">○ Offline</span>`;
+        const tierBadge = farming && acc.tier
+            ? `<span class="badge badge-tier">${acc.tier}</span>` : "";
+
+        let stats = "";
         if (farming) {
-            badges += `<span class="type-badge farming">Farm</span>`;
-            const tier = (acc.tier || "").toLowerCase();
-            if (tier) badges += `<span class="tier-label ${tier}">${acc.tier}</span>`;
+            stats = `
+                <div class="stat"><div class="stat-lbl">Caught</div><div class="stat-val gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-lbl">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-lbl">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
+                <div class="stat"><div class="stat-lbl">Uptime</div><div class="stat-val">${formatUptime(acc.uptime)}</div></div>`;
         } else {
-            badges += `<span class="type-badge training">Train</span>`;
+            stats = `
+                <div class="stat"><div class="stat-lbl">Receipts</div><div class="stat-val gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-lbl">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat"><div class="stat-lbl">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
+                <div class="stat"><div class="stat-lbl">Uptime</div><div class="stat-val">${formatUptime(acc.uptime)}</div></div>`;
         }
 
-        let statsHtml = "";
-        if (farming) {
-            statsHtml = `
-                <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
-                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
-                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-label">Caught</div><div class="stat-value gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>`;
-        } else {
-            statsHtml = `
-                <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
-                <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
-                <div class="stat"><div class="stat-label">Receipts</div><div class="stat-value gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>`;
-        }
-
-        // Indicators (farming accounts only)
-        let indicatorHtml = "";
+        let indHtml = "";
         if (farming && acc.indicators) {
             for (const [ind, animals] of Object.entries(acc.indicators)) {
                 if (!Array.isArray(animals) || animals.length === 0) continue;
-                const rows = animals.map(a =>
-                    `<div class="indicator-animal"><span class="breed">${a.breed}</span><span class="coat">${a.coat}</span><span class="hair">${a.maneColor}</span></div>`
-                ).join("");
-                indicatorHtml += `
-                <div class="indicator-group">
-                    <div class="indicator-header">
-                        <span>${ind}</span>
-                        <span class="indicator-count">${animals.length}</span>
-                    </div>
-                    <div class="indicator-animals">${rows}</div>
+                const rows = animals.map(a => `
+                    <div class="ind-row">
+                        <span class="breed">${a.breed}</span>
+                        <span class="coat">${a.coat}</span>
+                        <span class="hair">${a.maneColor}</span>
+                    </div>`).join("");
+                indHtml += `<div class="ind-group">
+                    <div class="ind-head"><span>${ind}</span><span class="ind-count">${animals.length}</span></div>
+                    <div class="ind-animals">${rows}</div>
                 </div>`;
             }
         }
 
-        return `
-        <div class="card ${online ? "" : "offline"}">
+        const cardClass = [
+            "card",
+            online ? "online" : "offline",
+            farming ? "farming" : "training"
+        ].join(" ");
+
+        return `<div class="${cardClass}" style="animation-delay:${i * 0.04}s">
             <button class="remove-btn" onclick="removeAccount('${name}')" title="Remove">✕</button>
-            <div class="card-header">
-                <span class="card-name" title="${name}">${name}</span>
-                <div>${badges}</div>
+            <div class="card-name" title="${name}">${name}</div>
+            <div class="card-badges">${typeBadge}${statusBadge}${tierBadge}</div>
+            <div class="card-status ${online ? "" : "dim"}">${online ? (acc.status || "Running") : "Offline"}</div>
+            <div class="stats">${stats}</div>
+            ${indHtml ? `<div class="indicators">${indHtml}</div>` : ""}
+            <div class="card-ts">
+                <span>${acc.island || "—"}</span>
+                <span>${acc.timestamp ? timeAgo(acc.timestamp) : "never"}</span>
             </div>
-            <div class="card-status ${online ? "" : "offline-text"}">${online ? (acc.status || "Running") : "Offline"}</div>
-            <div class="card-stats">${statsHtml}</div>
-            ${indicatorHtml ? `<div class="card-indicators">${indicatorHtml}</div>` : ""}
-            <div class="last-update">${acc.timestamp ? timeAgo(acc.timestamp) : "never"}</div>
         </div>`;
     }).join("");
-}
-
-async function removeAccount(username) {
-    try {
-        await fetch(`/api/accounts/${encodeURIComponent(username)}`, { method: "DELETE" });
-        delete accounts[username];
-        render();
-    } catch (e) {}
 }
 
 async function poll() {
     try {
         const res = await fetch("/api/accounts");
         if (res.ok) { accounts = await res.json(); render(); }
-    } catch (e) {}
+    } catch(e) {}
 }
 
 poll();
-setInterval(poll, POLL_INTERVAL);
+setInterval(poll, 3000);
 </script>
 </body>
 </html>
