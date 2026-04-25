@@ -1,249 +1,262 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WHI Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-    --bg: #06060f;
-    --surface: #0d0d1a;
-    --surface2: #13132200;
-    --border: rgba(255,255,255,0.06);
-    --border-hover: rgba(255,255,255,0.12);
-    --text: #eeeef5;
-    --text-dim: #55556a;
-    --text-mid: #9090a8;
-    --accent: #6c6af7;
-    --accent-glow: rgba(108,106,247,0.15);
-    --green: #00e5a0;
-    --green-glow: rgba(0,229,160,0.12);
-    --amber: #ffb547;
-    --amber-glow: rgba(255,181,71,0.12);
-    --red: #ff4f6a;
-    --purple: #a78bfa;
-    --cyan: #22d9ee;
-    --radius: 12px;
+/* ── TOKENS ── */
+[data-theme="dark"] {
+    --bg:           #1c1c1e;
+    --bg2:          #2c2c2e;
+    --surface:      rgba(44,44,46,0.95);
+    --surface2:     rgba(58,58,60,0.7);
+    --surface3:     rgba(72,72,74,0.5);
+    --border:       rgba(255,255,255,0.10);
+    --border-strong:rgba(255,255,255,0.18);
+    --text:         #f5f5f7;
+    --text2:        rgba(245,245,247,0.6);
+    --text3:        rgba(245,245,247,0.32);
+    --blue:         #0a84ff;
+    --green:        #30d158;
+    --amber:        #ffd60a;
+    --red:          #ff453a;
+    --purple:       #bf5af2;
+    --cyan:         #5ac8fa;
+    --teal:         #40c8e0;
+    --shadow:       0 2px 16px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.25);
+    --shadow-lg:    0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25);
+    --blur-bg:      rgba(44,44,46,0.85);
+    --theme-icon:   "☀️";
 }
 
-html { scrollbar-width: thin; scrollbar-color: #1e1e30 transparent; }
+[data-theme="light"] {
+    --bg:           #f2f2f7;
+    --bg2:          #ffffff;
+    --surface:      rgba(255,255,255,0.95);
+    --surface2:     rgba(242,242,247,0.8);
+    --surface3:     rgba(229,229,234,0.6);
+    --border:       rgba(0,0,0,0.06);
+    --border-strong:rgba(0,0,0,0.12);
+    --text:         #1d1d1f;
+    --text2:        rgba(29,29,31,0.55);
+    --text3:        rgba(29,29,31,0.28);
+    --blue:         #007aff;
+    --green:        #34c759;
+    --amber:        #ff9f0a;
+    --red:          #ff3b30;
+    --purple:       #af52de;
+    --cyan:         #32ade6;
+    --teal:         #30b0c7;
+    --shadow:       0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-lg:    0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    --blur-bg:      rgba(255,255,255,0.85);
+    --theme-icon:   "🌙";
+}
+
+html { -webkit-font-smoothing: antialiased; }
 
 body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'DM Mono', monospace;
+    font-family: -apple-system, "SF Pro Display", "SF Pro Text", BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
     min-height: 100vh;
-    overflow-x: hidden;
+    transition: background 0.35s ease, color 0.35s ease;
 }
 
-/* Grid background */
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(108,106,247,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(108,106,247,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* Radial glow top */
-body::after {
-    content: '';
-    position: fixed;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 900px;
-    height: 500px;
-    background: radial-gradient(ellipse, rgba(108,106,247,0.07) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-.wrap { position: relative; z-index: 1; }
-
-/* ── HEADER ── */
-header {
-    padding: 48px 52px 36px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 32px;
-    flex-wrap: wrap;
+/* ── NAVBAR ── */
+nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--blur-bg);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-bottom: 1px solid var(--border);
-}
-
-.brand {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.brand-top {
+    padding: 0 32px;
+    height: 52px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: space-between;
+    transition: background 0.35s;
 }
 
-.brand-icon {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, var(--accent), #9c6af7);
-    border-radius: 10px;
-    display: grid;
-    place-items: center;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
+.nav-left { display: flex; align-items: center; gap: 16px; }
+
+.nav-logo {
     font-size: 17px;
-    color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 0 24px rgba(108,106,247,0.3);
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    color: var(--text);
 }
 
-.brand h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 26px;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, var(--text) 40%, var(--text-mid));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.live-badge {
+.live-chip {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 5px;
+    background: rgba(48,209,88,0.12);
+    border: 1px solid rgba(48,209,88,0.2);
+    border-radius: 20px;
+    padding: 3px 9px 3px 7px;
     font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.5px;
+    font-weight: 500;
+    color: var(--green);
+    letter-spacing: 0.1px;
 }
 
 .live-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px; height: 6px;
     background: var(--green);
     border-radius: 50%;
-    box-shadow: 0 0 8px var(--green);
-    animation: live-pulse 2s ease-in-out infinite;
+    animation: live 2s ease-in-out infinite;
 }
 
-@keyframes live-pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
-    50% { opacity: 0.5; box-shadow: 0 0 3px var(--green); }
+@keyframes live {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.4; }
 }
 
-.header-stats {
-    display: flex;
-    gap: 2px;
-    align-items: stretch;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: var(--surface);
-}
+.nav-right { display: flex; align-items: center; gap: 10px; }
 
-.hstat {
-    padding: 16px 28px;
-    text-align: center;
-    position: relative;
-}
-
-.hstat + .hstat::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 20%;
-    height: 60%;
-    width: 1px;
-    background: var(--border);
-}
-
-.hstat-val {
-    font-family: 'Syne', sans-serif;
-    font-size: 30px;
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    line-height: 1;
-    margin-bottom: 4px;
-}
-
-.hstat-lbl {
-    font-size: 10px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
+.nav-link {
+    font-size: 13px;
     font-weight: 500;
+    color: var(--blue);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 7px;
+    transition: background 0.15s;
+}
+.nav-link:hover { background: rgba(10,132,255,0.08); }
+
+.theme-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 15px;
+    display: grid;
+    place-items: center;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+}
+.theme-btn:hover { background: var(--surface3); transform: scale(1.05); }
+.theme-btn:active { transform: scale(0.95); }
+
+/* ── PAGE ── */
+.page { max-width: 1200px; margin: 0 auto; padding: 32px 32px 64px; }
+
+/* ── SUMMARY BAR ── */
+.summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
 }
 
-.hstat-val.c-accent { color: var(--accent); }
-.hstat-val.c-green { color: var(--green); }
-.hstat-val.c-amber { color: var(--amber); }
-.hstat-val.c-purple { color: var(--purple); }
+.scard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+    transition: background 0.35s, border-color 0.35s, box-shadow 0.2s, transform 0.15s;
+    animation: fade-up 0.4s ease both;
+}
 
-/* ── MAIN ── */
-main { padding: 32px 52px 60px; }
+.scard:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 
-/* ── FILTERS ── */
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.scard-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+    letter-spacing: 0.2px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.scard-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.scard-val {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1.2px;
+    line-height: 1;
+}
+
+.c-blue   { color: var(--blue); }
+.c-green  { color: var(--green); }
+.c-amber  { color: var(--amber); }
+.c-purple { color: var(--purple); }
+
+/* ── TOOLBAR ── */
 .toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 28px;
+    margin-bottom: 18px;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
 }
 
-.filters {
+.seg-control {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 2px;
+    gap: 1px;
 }
 
-.filter-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
+.seg-btn {
+    font-size: 12px;
     font-weight: 500;
-    padding: 7px 16px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
+    padding: 5px 14px;
+    border: none;
     background: transparent;
-    color: var(--text-dim);
+    color: var(--text2);
+    border-radius: 7px;
     cursor: pointer;
     transition: all 0.15s;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
 }
 
-.filter-btn:hover {
-    border-color: var(--border-hover);
+.seg-btn.active {
+    background: var(--bg2);
     color: var(--text);
+    box-shadow: var(--shadow);
 }
 
-.filter-btn.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-    box-shadow: 0 0 16px rgba(108,106,247,0.25);
-}
+[data-theme="light"] .seg-btn.active { background: #fff; }
 
-.count-badge {
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 0.3px;
+.result-count {
+    font-size: 12px;
+    color: var(--text3);
+    font-weight: 500;
 }
 
 /* ── GRID ── */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
     align-items: start;
 }
 
@@ -251,146 +264,114 @@ main { padding: 32px 52px 60px; }
 .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px;
-    position: relative;
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
-    animation: card-in 0.3s ease both;
+    border-radius: 18px;
+    padding: 0;
     overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: background 0.35s, border-color 0.35s, box-shadow 0.2s, transform 0.15s, opacity 0.3s;
+    animation: fade-up 0.35s ease both;
+    position: relative;
 }
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-    background: var(--accent);
-    opacity: 0.5;
-    transition: opacity 0.2s;
-}
-
-.card.online::before { background: var(--green); opacity: 0.8; }
-.card.offline::before { background: var(--text-dim); opacity: 0.4; }
-.card.farming::before { background: var(--green); }
-.card.training::before { background: var(--amber); }
 
 .card:hover {
-    border-color: var(--border-hover);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--border-hover);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
 }
 
-.card.offline { opacity: 0.4; }
+.card.offline { opacity: 0.45; }
 
-@keyframes card-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+/* Color strip top */
+.card-strip {
+    height: 3px;
+    width: 100%;
+}
+.strip-farm  { background: linear-gradient(90deg, var(--green), var(--teal)); }
+.strip-train { background: linear-gradient(90deg, var(--amber), #ff9500); }
+.strip-off   { background: var(--surface3); }
+
+.card-body { padding: 18px 20px 20px; }
+
+/* Card header row */
+.card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
 }
 
-/* Remove button */
-.remove-btn {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text-dim);
-    font-size: 13px;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    opacity: 0;
-    transition: all 0.15s;
-    line-height: 1;
-}
-
-.card:hover .remove-btn { opacity: 1; }
-.remove-btn:hover {
-    background: rgba(255,79,106,0.15);
-    border-color: rgba(255,79,106,0.3);
-    color: var(--red);
-}
-
-/* Card header */
 .card-name {
-    font-family: 'Syne', sans-serif;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: -0.3px;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: calc(100% - 80px);
-    margin-bottom: 4px;
+    max-width: 200px;
 }
 
 .card-badges {
     display: flex;
-    gap: 6px;
-    align-items: center;
-    margin-bottom: 14px;
+    gap: 5px;
     flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
-.badge {
-    font-size: 9px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    padding: 3px 9px;
-    border-radius: 4px;
+.pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
 }
 
-.badge-farm  { background: rgba(0,229,160,0.1); color: var(--green); border: 1px solid rgba(0,229,160,0.2); }
-.badge-train { background: rgba(255,181,71,0.1); color: var(--amber); border: 1px solid rgba(255,181,71,0.2); }
-.badge-online  { background: rgba(0,229,160,0.08); color: var(--green); border: 1px solid rgba(0,229,160,0.15); }
-.badge-offline { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border); }
-.badge-tier { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.2); }
+.pill-farm    { background: rgba(48,209,88,0.12);  color: var(--green); }
+.pill-train   { background: rgba(255,214,10,0.12); color: var(--amber); }
+.pill-online  { background: rgba(48,209,88,0.10);  color: var(--green); }
+.pill-offline { background: var(--surface3); color: var(--text3); }
+.pill-tier    { background: rgba(191,90,242,0.12); color: var(--purple); }
 
-/* Status line */
+/* Status */
 .card-status {
-    font-size: 11px;
-    color: var(--green);
+    font-size: 12px;
+    color: var(--text2);
     margin-bottom: 16px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    opacity: 0.9;
+    font-weight: 400;
+    line-height: 1.4;
 }
 
-.card-status.dim { color: var(--text-dim); }
-
-/* Stats grid */
-.stats {
+/* Stats */
+.stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-bottom: 14px;
 }
 
-.stat {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
+.stat-cell {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 11px 13px;
+    transition: background 0.35s;
 }
 
-.stat-lbl {
-    font-size: 9px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.stat-key {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
     margin-bottom: 3px;
+    letter-spacing: 0.1px;
 }
 
 .stat-val {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
@@ -399,170 +380,208 @@ main { padding: 32px 52px 60px; }
 
 .stat-val.gold { color: var(--amber); }
 
-/* Indicators */
-.indicators { margin-top: 4px; }
+/* Footer */
+.card-foot {
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-.ind-group { margin-bottom: 6px; }
+.card-ts {
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 400;
+}
+
+.remove-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    font-size: 13px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transition: all 0.15s;
+}
+
+.card:hover .remove-btn { opacity: 1; }
+.remove-btn:hover { background: rgba(255,69,58,0.1); color: var(--red); }
+
+/* Indicators */
+.ind-wrap { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+.ind-group { margin-bottom: 8px; }
 
 .ind-head {
-    font-size: 9px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--amber);
-    padding: 4px 10px;
-    background: rgba(255,181,71,0.08);
-    border: 1px solid rgba(255,181,71,0.15);
-    border-bottom: none;
-    border-radius: 6px 6px 0 0;
+    margin-bottom: 4px;
     display: flex;
     justify-content: space-between;
 }
 
-.ind-count {
-    background: rgba(255,181,71,0.2);
-    padding: 0 6px;
-    border-radius: 3px;
+.ind-count-badge {
+    background: rgba(255,214,10,0.15);
+    color: var(--amber);
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 10px;
 }
 
-.ind-animals {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,181,71,0.1);
-    border-radius: 0 0 6px 6px;
+.ind-list {
+    background: var(--surface2);
+    border-radius: 8px;
+    overflow: hidden;
     max-height: 110px;
     overflow-y: auto;
 }
 
 .ind-row {
-    font-size: 10px;
-    padding: 4px 10px;
+    font-size: 11px;
+    padding: 5px 11px;
     display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
 }
 .ind-row:last-child { border-bottom: none; }
-.ind-row .breed { color: var(--text); }
-.ind-row .coat  { color: var(--cyan); }
-.ind-row .hair  { color: var(--purple); }
-
-/* Timestamp */
-.card-ts {
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-}
+.ind-breed { color: var(--text); font-weight: 500; flex: 1; }
+.ind-coat  { color: var(--cyan); }
+.ind-hair  { color: var(--purple); }
 
 /* ── EMPTY ── */
 .empty {
     grid-column: 1 / -1;
     text-align: center;
     padding: 100px 20px;
+    color: var(--text2);
 }
+.empty h2 { font-size: 22px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.4px; color: var(--text); }
+.empty p  { font-size: 14px; }
 
-.empty h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 8px;
+/* Stagger delays */
+.card:nth-child(1) { animation-delay: 0s; }
+.card:nth-child(2) { animation-delay: 0.04s; }
+.card:nth-child(3) { animation-delay: 0.08s; }
+.card:nth-child(4) { animation-delay: 0.12s; }
+.card:nth-child(5) { animation-delay: 0.16s; }
+.card:nth-child(6) { animation-delay: 0.20s; }
+
+@media (max-width: 700px) {
+    nav { padding: 0 16px; }
+    .page { padding: 20px 16px 48px; }
+    .summary { grid-template-columns: 1fr 1fr; }
 }
-
-.empty p { color: var(--text-dim); font-size: 13px; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<header>
-    <div class="brand">
-        <div class="brand-top">
-            <div class="brand-icon">W</div>
-            <h1>WHI Dashboard</h1>
-        </div>
-        <div class="live-badge">
+<nav>
+    <div class="nav-left">
+        <span class="nav-logo">WHI</span>
+        <div class="live-chip">
             <span class="live-dot"></span>
-            live · updates every 10s
+            Live
+        </div>
+    </div>
+    <div class="nav-right">
+        <a href="/panel" class="nav-link">Control Panel ↗</a>
+        <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+    </div>
+</nav>
+
+<div class="page">
+
+    <div class="summary">
+        <div class="scard" style="animation-delay:0s">
+            <div class="scard-label"><span class="scard-dot" style="background:var(--blue)"></span>Accounts</div>
+            <div class="scard-val c-blue" id="totalAccounts">0</div>
+        </div>
+        <div class="scard" style="animation-delay:0.06s">
+            <div class="scard-label"><span class="scard-dot" style="background:var(--green)"></span>Online</div>
+            <div class="scard-val c-green" id="onlineCount">0</div>
+        </div>
+        <div class="scard" style="animation-delay:0.12s">
+            <div class="scard-label"><span class="scard-dot" style="background:var(--amber)"></span>Caught</div>
+            <div class="scard-val c-amber" id="totalCaught">0</div>
+        </div>
+        <div class="scard" style="animation-delay:0.18s">
+            <div class="scard-label"><span class="scard-dot" style="background:var(--purple)"></span>Receipts</div>
+            <div class="scard-val c-purple" id="totalReceipts">0</div>
         </div>
     </div>
 
-    <div class="header-stats">
-        <div class="hstat">
-            <div class="hstat-val c-accent" id="totalAccounts">0</div>
-            <div class="hstat-lbl">Accounts</div>
-        </div>
-        <div class="hstat">
-            <div class="hstat-val c-green" id="onlineCount">0</div>
-            <div class="hstat-lbl">Online</div>
-        </div>
-        <div class="hstat">
-            <div class="hstat-val c-amber" id="totalCaught">0</div>
-            <div class="hstat-lbl">Caught</div>
-        </div>
-        <div class="hstat">
-            <div class="hstat-val c-purple" id="totalReceipts">0</div>
-            <div class="hstat-lbl">Receipts</div>
-        </div>
-    </div>
-</header>
-
-<main>
     <div class="toolbar">
-        <div class="filters">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="online">Online</button>
-            <button class="filter-btn" data-filter="offline">Offline</button>
-            <button class="filter-btn" data-filter="farming">Farming</button>
-            <button class="filter-btn" data-filter="training">Training</button>
+        <div class="seg-control">
+            <button class="seg-btn active" data-filter="all">All</button>
+            <button class="seg-btn" data-filter="online">Online</button>
+            <button class="seg-btn" data-filter="offline">Offline</button>
+            <button class="seg-btn" data-filter="farming">Farming</button>
+            <button class="seg-btn" data-filter="training">Training</button>
         </div>
-        <span class="count-badge" id="countBadge"></span>
+        <span class="result-count" id="resultCount"></span>
     </div>
 
     <div class="grid" id="grid"></div>
-</main>
-
 </div>
+
 <script>
-const OFFLINE_THRESHOLD = 30000;
-let currentFilter = "all";
+const OFFLINE = 30000;
+let filter = "all";
 let accounts = {};
 
-document.querySelectorAll(".filter-btn").forEach(btn => {
+// Theme
+const html = document.documentElement;
+const themeBtn = document.getElementById("themeBtn");
+const saved = localStorage.getItem("whi-theme") || "dark";
+html.setAttribute("data-theme", saved);
+themeBtn.textContent = saved === "dark" ? "☀️" : "🌙";
+
+themeBtn.addEventListener("click", () => {
+    const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    html.setAttribute("data-theme", next);
+    themeBtn.textContent = next === "dark" ? "☀️" : "🌙";
+    localStorage.setItem("whi-theme", next);
+});
+
+// Filters
+document.querySelectorAll(".seg-btn").forEach(btn => {
     btn.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        currentFilter = btn.dataset.filter;
+        filter = btn.dataset.filter;
         render();
     });
 });
 
-function timeAgo(ts) {
+function ago(ts) {
     const d = Math.floor((Date.now() - ts) / 1000);
-    if (d < 5) return "just now";
-    if (d < 60) return d + "s ago";
+    if (d < 5)    return "just now";
+    if (d < 60)   return d + "s ago";
     if (d < 3600) return Math.floor(d / 60) + "m ago";
     return Math.floor(d / 3600) + "h ago";
 }
 
-function formatUptime(s) {
-    if (!s || s <= 0) return "0s";
+function uptime(s) {
+    if (!s || s <= 0) return "—";
     const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
     if (d > 0) return d + "d " + h + "h";
     if (h > 0) return h + "h " + m + "m";
     return m + "m";
 }
 
-function isOnline(acc) { return acc.timestamp && (Date.now() - acc.timestamp) < OFFLINE_THRESHOLD; }
-function isFarming(acc) { return acc.animalsCaptured !== undefined || acc.tier !== undefined; }
+function online(a)  { return a.timestamp && (Date.now() - a.timestamp) < OFFLINE; }
+function farming(a) { return a.animalsCaptured !== undefined || a.tier !== undefined; }
 
-async function removeAccount(username) {
+async function removeAccount(name) {
     try {
-        await fetch(`/api/accounts/${encodeURIComponent(username)}`, { method: "DELETE" });
-        delete accounts[username];
+        await fetch(`/api/accounts/${encodeURIComponent(name)}`, { method: "DELETE" });
+        delete accounts[name];
         render();
     } catch(e) {}
 }
@@ -570,100 +589,99 @@ async function removeAccount(username) {
 function render() {
     const grid = document.getElementById("grid");
     const entries = Object.entries(accounts);
+    entries.sort((a, b) => (online(a[1]) ? 0 : 1) - (online(b[1]) ? 0 : 1) || a[0].localeCompare(b[0]));
 
-    entries.sort((a, b) => {
-        const aOn = isOnline(a[1]) ? 0 : 1, bOn = isOnline(b[1]) ? 0 : 1;
-        return aOn !== bOn ? aOn - bOn : a[0].localeCompare(b[0]);
-    });
-
-    const filtered = entries.filter(([, acc]) => {
-        if (currentFilter === "all") return true;
-        if (currentFilter === "online") return isOnline(acc);
-        if (currentFilter === "offline") return !isOnline(acc);
-        if (currentFilter === "farming") return isFarming(acc);
-        if (currentFilter === "training") return !isFarming(acc);
+    const filtered = entries.filter(([, a]) => {
+        if (filter === "online")   return online(a);
+        if (filter === "offline")  return !online(a);
+        if (filter === "farming")  return farming(a);
+        if (filter === "training") return !farming(a);
         return true;
     });
 
-    let caught = 0, receipts = 0, online = 0;
-    entries.forEach(([, acc]) => {
-        caught += acc.animalsCaptured || 0;
-        receipts += acc.trainingReceipts || 0;
-        if (isOnline(acc)) online++;
+    let caught = 0, receipts = 0, onlineN = 0;
+    entries.forEach(([, a]) => {
+        caught += a.animalsCaptured || 0;
+        receipts += a.trainingReceipts || 0;
+        if (online(a)) onlineN++;
     });
 
     document.getElementById("totalAccounts").textContent = entries.length;
-    document.getElementById("onlineCount").textContent = online;
-    document.getElementById("totalCaught").textContent = caught.toLocaleString();
+    document.getElementById("onlineCount").textContent   = onlineN;
+    document.getElementById("totalCaught").textContent   = caught.toLocaleString();
     document.getElementById("totalReceipts").textContent = receipts.toLocaleString();
-    document.getElementById("countBadge").textContent = filtered.length + " account" + (filtered.length !== 1 ? "s" : "");
+    document.getElementById("resultCount").textContent   = filtered.length + " account" + (filtered.length !== 1 ? "s" : "");
 
-    if (filtered.length === 0) {
-        grid.innerHTML = `<div class="empty"><h2>No accounts</h2><p>Waiting for status reports...</p></div>`;
+    if (!filtered.length) {
+        grid.innerHTML = `<div class="empty"><h2>No accounts</h2><p>Waiting for status reports…</p></div>`;
         return;
     }
 
-    grid.innerHTML = filtered.map(([name, acc], i) => {
-        const online = isOnline(acc);
-        const farming = isFarming(acc);
+    grid.innerHTML = filtered.map(([name, acc]) => {
+        const isOnline  = online(acc);
+        const isFarming = farming(acc);
+        const strip = !isOnline ? "strip-off" : isFarming ? "strip-farm" : "strip-train";
 
-        const typeBadge = farming
-            ? `<span class="badge badge-farm">Farm</span>`
-            : `<span class="badge badge-train">Train</span>`;
-        const statusBadge = online
-            ? `<span class="badge badge-online">● Online</span>`
-            : `<span class="badge badge-offline">○ Offline</span>`;
-        const tierBadge = farming && acc.tier
-            ? `<span class="badge badge-tier">${acc.tier}</span>` : "";
+        const badges = [
+            isFarming
+                ? `<span class="pill pill-farm">Farm</span>`
+                : `<span class="pill pill-train">Train</span>`,
+            isOnline
+                ? `<span class="pill pill-online">● Online</span>`
+                : `<span class="pill pill-offline">○ Offline</span>`,
+            acc.tier ? `<span class="pill pill-tier">${acc.tier}</span>` : "",
+        ].join("");
 
         let stats = "";
-        if (farming) {
+        if (isFarming) {
             stats = `
-                <div class="stat"><div class="stat-lbl">Caught</div><div class="stat-val gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-lbl">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-lbl">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
-                <div class="stat"><div class="stat-lbl">Uptime</div><div class="stat-val">${formatUptime(acc.uptime)}</div></div>`;
+                <div class="stat-cell"><div class="stat-key">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
+                <div class="stat-cell"><div class="stat-key">Level</div><div class="stat-val">${acc.level || 0}</div></div>
+                <div class="stat-cell"><div class="stat-key">Caught</div><div class="stat-val gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
+                <div class="stat-cell"><div class="stat-key">Uptime</div><div class="stat-val">${uptime(acc.uptime)}</div></div>
+                <div class="stat-cell"><div class="stat-key">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat-cell"><div class="stat-key">Lassos</div><div class="stat-val">${(acc.lassoCount || 0).toLocaleString()}</div></div>`;
         } else {
             stats = `
-                <div class="stat"><div class="stat-lbl">Receipts</div><div class="stat-val gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-lbl">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
-                <div class="stat"><div class="stat-lbl">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
-                <div class="stat"><div class="stat-lbl">Uptime</div><div class="stat-val">${formatUptime(acc.uptime)}</div></div>`;
+                <div class="stat-cell"><div class="stat-key">Receipts</div><div class="stat-val gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
+                <div class="stat-cell"><div class="stat-key">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
+                <div class="stat-cell"><div class="stat-key">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
+                <div class="stat-cell"><div class="stat-key">Uptime</div><div class="stat-val">${uptime(acc.uptime)}</div></div>`;
         }
 
         let indHtml = "";
-        if (farming && acc.indicators) {
+        if (isFarming && acc.indicators) {
+            let rows = "";
             for (const [ind, animals] of Object.entries(acc.indicators)) {
-                if (!Array.isArray(animals) || animals.length === 0) continue;
-                const rows = animals.map(a => `
-                    <div class="ind-row">
-                        <span class="breed">${a.breed}</span>
-                        <span class="coat">${a.coat}</span>
-                        <span class="hair">${a.maneColor}</span>
-                    </div>`).join("");
-                indHtml += `<div class="ind-group">
-                    <div class="ind-head"><span>${ind}</span><span class="ind-count">${animals.length}</span></div>
-                    <div class="ind-animals">${rows}</div>
+                if (!Array.isArray(animals) || !animals.length) continue;
+                rows += `<div class="ind-group">
+                    <div class="ind-head"><span>${ind}</span><span class="ind-count-badge">${animals.length}</span></div>
+                    <div class="ind-list">${animals.map(a => `
+                        <div class="ind-row">
+                            <span class="ind-breed">${a.breed}</span>
+                            <span class="ind-coat">${a.coat}</span>
+                            <span class="ind-hair">${a.maneColor}</span>
+                        </div>`).join("")}
+                    </div>
                 </div>`;
             }
+            if (rows) indHtml = `<div class="ind-wrap">${rows}</div>`;
         }
 
-        const cardClass = [
-            "card",
-            online ? "online" : "offline",
-            farming ? "farming" : "training"
-        ].join(" ");
-
-        return `<div class="${cardClass}" style="animation-delay:${i * 0.04}s">
-            <button class="remove-btn" onclick="removeAccount('${name}')" title="Remove">✕</button>
-            <div class="card-name" title="${name}">${name}</div>
-            <div class="card-badges">${typeBadge}${statusBadge}${tierBadge}</div>
-            <div class="card-status ${online ? "" : "dim"}">${online ? (acc.status || "Running") : "Offline"}</div>
-            <div class="stats">${stats}</div>
-            ${indHtml ? `<div class="indicators">${indHtml}</div>` : ""}
-            <div class="card-ts">
-                <span>${acc.island || "—"}</span>
-                <span>${acc.timestamp ? timeAgo(acc.timestamp) : "never"}</span>
+        return `<div class="card ${isOnline ? "" : "offline"}">
+            <div class="card-strip ${strip}"></div>
+            <div class="card-body">
+                <div class="card-head">
+                    <div class="card-name" title="${name}">${name}</div>
+                    <div class="card-badges">${badges}</div>
+                </div>
+                <div class="card-status">${isOnline ? (acc.status || "Running") : "Offline"}</div>
+                <div class="stats-grid">${stats}</div>
+                ${indHtml}
+                <div class="card-foot">
+                    <span class="card-ts">${acc.timestamp ? ago(acc.timestamp) : "never"}</span>
+                    <button class="remove-btn" onclick="removeAccount('${name}')" title="Remove">✕</button>
+                </div>
             </div>
         </div>`;
     }).join("");
@@ -671,13 +689,13 @@ function render() {
 
 async function poll() {
     try {
-        const res = await fetch("/api/accounts");
-        if (res.ok) { accounts = await res.json(); render(); }
+        const r = await fetch("/api/accounts");
+        if (r.ok) { accounts = await r.json(); render(); }
     } catch(e) {}
 }
 
 poll();
-setInterval(poll, 10000);
+setInterval(poll, 3000);
 </script>
 </body>
 </html>
