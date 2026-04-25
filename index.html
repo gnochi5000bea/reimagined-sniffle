@@ -74,8 +74,8 @@ nav {
     top: 0;
     z-index: 100;
     background: var(--blur-bg);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(200%) blur(28px);
+    -webkit-backdrop-filter: saturate(200%) blur(28px);
     border-bottom: 1px solid var(--border);
     padding: 0 32px;
     height: 52px;
@@ -161,6 +161,8 @@ nav {
 
 .scard {
     background: var(--surface);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 20px 22px;
@@ -218,6 +220,8 @@ nav {
 .seg-control {
     display: flex;
     background: var(--surface2);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
     border: 1px solid var(--border);
     border-radius: 9px;
     padding: 2px;
@@ -263,14 +267,19 @@ nav {
 /* ── CARD ── */
 .card {
     background: var(--surface);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
     border: 1px solid var(--border);
     border-radius: 18px;
     padding: 0;
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: background 0.35s, border-color 0.35s, box-shadow 0.2s, transform 0.15s, opacity 0.3s;
-    animation: fade-up 0.35s ease both;
     position: relative;
+}
+
+.card.is-new {
+    animation: fade-up 0.35s ease both;
 }
 
 .card:hover {
@@ -355,6 +364,8 @@ nav {
 
 .stat-cell {
     background: var(--surface2);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
     border-radius: 10px;
     padding: 11px 13px;
     transition: background 0.35s;
@@ -534,6 +545,7 @@ nav {
 const OFFLINE = 30000;
 let filter = "all";
 let accounts = {};
+const knownAccounts = new Set(); // tracks which cards already exist in the DOM
 
 // Theme
 const html = document.documentElement;
@@ -582,8 +594,83 @@ async function removeAccount(name) {
     try {
         await fetch(`/api/accounts/${encodeURIComponent(name)}`, { method: "DELETE" });
         delete accounts[name];
+        knownAccounts.delete(name);
+        const el = document.getElementById("card-" + CSS.escape(name));
+        if (el) el.remove();
         render();
     } catch(e) {}
+}
+
+function buildCardInner(name, acc) {
+    const isOnline  = online(acc);
+    const isFarming = farming(acc);
+    const strip = !isOnline ? "strip-off" : isFarming ? "strip-farm" : "strip-train";
+
+    const badges = [
+        isFarming
+            ? `<span class="pill pill-farm">Farm</span>`
+            : `<span class="pill pill-train">Train</span>`,
+        isOnline
+            ? `<span class="pill pill-online">● Online</span>`
+            : `<span class="pill pill-offline">○ Offline</span>`,
+        acc.tier ? `<span class="pill pill-tier">${acc.tier}</span>` : "",
+    ].join("");
+
+    let stats = "";
+    if (isFarming) {
+        stats = `
+            <div class="stat-cell"><div class="stat-key">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
+            <div class="stat-cell"><div class="stat-key">Level</div><div class="stat-val">${acc.level || 0}</div></div>
+            <div class="stat-cell"><div class="stat-key">Caught</div><div class="stat-val gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
+            <div class="stat-cell"><div class="stat-key">Uptime</div><div class="stat-val">${uptime(acc.uptime)}</div></div>
+            <div class="stat-cell"><div class="stat-key">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
+            <div class="stat-cell"><div class="stat-key">Lassos</div><div class="stat-val">${(acc.lassoCount || 0).toLocaleString()}</div></div>`;
+    } else {
+        stats = `
+            <div class="stat-cell"><div class="stat-key">Receipts</div><div class="stat-val gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
+            <div class="stat-cell"><div class="stat-key">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
+            <div class="stat-cell"><div class="stat-key">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
+            <div class="stat-cell"><div class="stat-key">Uptime</div><div class="stat-val">${uptime(acc.uptime)}</div></div>`;
+    }
+
+    let indHtml = "";
+    if (isFarming && acc.indicators) {
+        let rows = "";
+        for (const [ind, animals] of Object.entries(acc.indicators)) {
+            if (!Array.isArray(animals) || !animals.length) continue;
+            rows += `<div class="ind-group">
+                <div class="ind-head"><span>${ind}</span><span class="ind-count-badge">${animals.length}</span></div>
+                <div class="ind-list">${animals.map(a => `
+                    <div class="ind-row">
+                        <span class="ind-breed">${a.breed}</span>
+                        <span class="ind-coat">${a.coat}</span>
+                        <span class="ind-hair">${a.maneColor}</span>
+                    </div>`).join("")}
+                </div>
+            </div>`;
+        }
+        if (rows) indHtml = `<div class="ind-wrap">${rows}</div>`;
+    }
+
+    return {
+        strip,
+        offlineClass: isOnline ? "" : "offline",
+        inner: `
+            <div class="card-strip ${strip}"></div>
+            <div class="card-body">
+                <div class="card-head">
+                    <div class="card-name" title="${name}">${name}</div>
+                    <div class="card-badges">${badges}</div>
+                </div>
+                <div class="card-status">${isOnline ? (acc.status || "Running") : "Offline"}</div>
+                <div class="stats-grid">${stats}</div>
+                ${indHtml}
+                <div class="card-foot">
+                    <span class="card-ts">${acc.timestamp ? ago(acc.timestamp) : "never"}</span>
+                    <button class="remove-btn" onclick="removeAccount('${name}')" title="Remove">✕</button>
+                </div>
+            </div>`
+    };
 }
 
 function render() {
@@ -612,79 +699,52 @@ function render() {
     document.getElementById("totalReceipts").textContent = receipts.toLocaleString();
     document.getElementById("resultCount").textContent   = filtered.length + " account" + (filtered.length !== 1 ? "s" : "");
 
+    // Remove cards that are no longer in filtered list
+    const filteredNames = new Set(filtered.map(([n]) => n));
+    grid.querySelectorAll(".card[id]").forEach(el => {
+        const name = decodeURIComponent(el.id.replace("card-", ""));
+        if (!filteredNames.has(name)) el.remove();
+    });
+
     if (!filtered.length) {
-        grid.innerHTML = `<div class="empty"><h2>No accounts</h2><p>Waiting for status reports…</p></div>`;
+        if (!grid.querySelector(".empty")) {
+            grid.innerHTML = `<div class="empty"><h2>No accounts</h2><p>Waiting for status reports…</p></div>`;
+        }
         return;
     }
 
-    grid.innerHTML = filtered.map(([name, acc]) => {
-        const isOnline  = online(acc);
-        const isFarming = farming(acc);
-        const strip = !isOnline ? "strip-off" : isFarming ? "strip-farm" : "strip-train";
+    // Remove empty state if present
+    const emptyEl = grid.querySelector(".empty");
+    if (emptyEl) emptyEl.remove();
 
-        const badges = [
-            isFarming
-                ? `<span class="pill pill-farm">Farm</span>`
-                : `<span class="pill pill-train">Train</span>`,
-            isOnline
-                ? `<span class="pill pill-online">● Online</span>`
-                : `<span class="pill pill-offline">○ Offline</span>`,
-            acc.tier ? `<span class="pill pill-tier">${acc.tier}</span>` : "",
-        ].join("");
+    filtered.forEach(([name, acc], i) => {
+        const id = "card-" + encodeURIComponent(name);
+        const { inner, offlineClass } = buildCardInner(name, acc);
+        let el = document.getElementById(id);
 
-        let stats = "";
-        if (isFarming) {
-            stats = `
-                <div class="stat-cell"><div class="stat-key">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
-                <div class="stat-cell"><div class="stat-key">Level</div><div class="stat-val">${acc.level || 0}</div></div>
-                <div class="stat-cell"><div class="stat-key">Caught</div><div class="stat-val gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>
-                <div class="stat-cell"><div class="stat-key">Uptime</div><div class="stat-val">${uptime(acc.uptime)}</div></div>
-                <div class="stat-cell"><div class="stat-key">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
-                <div class="stat-cell"><div class="stat-key">Lassos</div><div class="stat-val">${(acc.lassoCount || 0).toLocaleString()}</div></div>`;
+        if (!el) {
+            // New card — create with animation
+            el = document.createElement("div");
+            el.id = id;
+            el.className = "card is-new " + offlineClass;
+            el.innerHTML = inner;
+            grid.appendChild(el);
+            knownAccounts.add(name);
+            // Remove animation class after it plays so re-filtering doesn't re-trigger
+            el.addEventListener("animationend", () => el.classList.remove("is-new"), { once: true });
         } else {
-            stats = `
-                <div class="stat-cell"><div class="stat-key">Receipts</div><div class="stat-val gold">${(acc.trainingReceipts || 0).toLocaleString()}</div></div>
-                <div class="stat-cell"><div class="stat-key">Tokens</div><div class="stat-val">${(acc.tokens || 0).toLocaleString()}</div></div>
-                <div class="stat-cell"><div class="stat-key">Island</div><div class="stat-val">${acc.island || "—"}</div></div>
-                <div class="stat-cell"><div class="stat-key">Uptime</div><div class="stat-val">${uptime(acc.uptime)}</div></div>`;
+            // Existing card — update content only, no animation
+            el.className = "card " + offlineClass;
+            el.innerHTML = inner;
         }
+    });
 
-        let indHtml = "";
-        if (isFarming && acc.indicators) {
-            let rows = "";
-            for (const [ind, animals] of Object.entries(acc.indicators)) {
-                if (!Array.isArray(animals) || !animals.length) continue;
-                rows += `<div class="ind-group">
-                    <div class="ind-head"><span>${ind}</span><span class="ind-count-badge">${animals.length}</span></div>
-                    <div class="ind-list">${animals.map(a => `
-                        <div class="ind-row">
-                            <span class="ind-breed">${a.breed}</span>
-                            <span class="ind-coat">${a.coat}</span>
-                            <span class="ind-hair">${a.maneColor}</span>
-                        </div>`).join("")}
-                    </div>
-                </div>`;
-            }
-            if (rows) indHtml = `<div class="ind-wrap">${rows}</div>`;
-        }
-
-        return `<div class="card ${isOnline ? "" : "offline"}">
-            <div class="card-strip ${strip}"></div>
-            <div class="card-body">
-                <div class="card-head">
-                    <div class="card-name" title="${name}">${name}</div>
-                    <div class="card-badges">${badges}</div>
-                </div>
-                <div class="card-status">${isOnline ? (acc.status || "Running") : "Offline"}</div>
-                <div class="stats-grid">${stats}</div>
-                ${indHtml}
-                <div class="card-foot">
-                    <span class="card-ts">${acc.timestamp ? ago(acc.timestamp) : "never"}</span>
-                    <button class="remove-btn" onclick="removeAccount('${name}')" title="Remove">✕</button>
-                </div>
-            </div>
-        </div>`;
-    }).join("");
+    // Re-order DOM nodes to match sorted order
+    filtered.forEach(([name]) => {
+        const id = "card-" + encodeURIComponent(name);
+        const el = document.getElementById(id);
+        if (el) grid.appendChild(el); // appendChild moves if already in DOM
+    });
 }
 
 async function poll() {
