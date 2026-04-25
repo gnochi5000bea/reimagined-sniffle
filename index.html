@@ -310,6 +310,29 @@ main { padding: 32px 48px 48px; }
     right: 12px;
 }
 
+.remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s, background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.card:hover .remove-btn { opacity: 1; }
+.remove-btn:hover { background: rgba(248, 113, 113, 0.15); color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
+
 .empty-state {
     grid-column: 1 / -1;
     text-align: center;
@@ -461,7 +484,6 @@ function render() {
             statsHtml = `
                 <div class="stat"><div class="stat-label">Island</div><div class="stat-value">${acc.island || "—"}</div></div>
                 <div class="stat"><div class="stat-label">Uptime</div><div class="stat-value">${formatUptime(acc.uptime)}</div></div>
-                <div class="stat"><div class="stat-label">Level</div><div class="stat-value">${acc.level || 0}</div></div>
                 <div class="stat"><div class="stat-label">Tokens</div><div class="stat-value">${(acc.tokens || 0).toLocaleString()}</div></div>
                 <div class="stat"><div class="stat-label">Caught</div><div class="stat-value gold">${(acc.animalsCaptured || 0).toLocaleString()}</div></div>`;
         } else {
@@ -493,6 +515,7 @@ function render() {
 
         return `
         <div class="card ${online ? "" : "offline"}">
+            <button class="remove-btn" onclick="removeAccount('${name}')" title="Remove">✕</button>
             <div class="card-header">
                 <span class="card-name" title="${name}">${name}</span>
                 <div>${badges}</div>
@@ -503,6 +526,14 @@ function render() {
             <div class="last-update">${acc.timestamp ? timeAgo(acc.timestamp) : "never"}</div>
         </div>`;
     }).join("");
+}
+
+async function removeAccount(username) {
+    try {
+        await fetch(`/api/accounts/${encodeURIComponent(username)}`, { method: "DELETE" });
+        delete accounts[username];
+        render();
+    } catch (e) {}
 }
 
 async function poll() {
