@@ -15,7 +15,7 @@ let sharedConfig = {
 
 const server = http.createServer((req, res) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return; }
 
@@ -46,6 +46,20 @@ const server = http.createServer((req, res) => {
     if (req.method === "GET" && req.url === "/api/accounts") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(accounts));
+        return;
+    }
+
+    // DELETE /api/accounts/:username — remove an account from the dashboard
+    if (req.method === "DELETE" && req.url.startsWith("/api/accounts/")) {
+        const username = decodeURIComponent(req.url.slice("/api/accounts/".length));
+        if (accounts[username]) {
+            delete accounts[username];
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ ok: true }));
+        } else {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "not found" }));
+        }
         return;
     }
 
@@ -99,5 +113,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`[WHI Dashboard] Initialized!`);
+    console.log(`[WHI Server] Running on http://localhost:${PORT}`);
+    console.log(`[WHI Server] Dashboard: http://localhost:${PORT}`);
+    console.log(`[WHI Server] Panel:     http://localhost:${PORT}/panel`);
 });
