@@ -404,6 +404,17 @@ nav {
                 </div>
             </div>
 
+            <div class="section">
+                <div class="section-title">Trade Mode</div>
+                <div class="toggle-row">
+                    <span class="toggle-name">Exempt Training Receipts</span>
+                    <label class="ios-toggle">
+                        <input type="checkbox" id="exemptTrainingReceiptsToggle">
+                        <span class="ios-track"></span>
+                    </label>
+                </div>
+            </div>
+
             <div class="divider"></div>
 
             <div class="section" style="padding-bottom:24px">
@@ -438,6 +449,10 @@ nav {
                     <span class="live-val" id="liveTarget">—</span>
                 </div>
                 <div class="live-row">
+                    <span class="live-key">Exempt training receipts</span>
+                    <span class="live-val off" id="liveExemptTrainingReceipts">Off</span>
+                </div>
+                <div class="live-row">
                     <span class="live-key">Turn-in & sell</span>
                     <span class="live-val on" id="liveTurnIn">On</span>
                 </div>
@@ -469,6 +484,7 @@ async function saveConfig() {
     const tradeEnabled  = document.getElementById("tradeToggle").checked;
     const targetPlayer  = document.getElementById("targetPlayer").value.trim();
     const turnInEnabled = document.getElementById("turnInToggle").checked;
+    const exemptTrainingReceiptsEnabled = document.getElementById("exemptTrainingReceiptsToggle").checked;
     const toast = document.getElementById("toast");
 
     try {
@@ -476,7 +492,7 @@ async function saveConfig() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                trade:  { enabled: tradeEnabled, targetPlayer },
+                trade:  { enabled: tradeEnabled, targetPlayer, exemptTrainingReceipts: exemptTrainingReceiptsEnabled },
                 turnIn: { enabled: turnInEnabled },
             })
         });
@@ -504,11 +520,15 @@ async function pollConfig() {
 
         document.getElementById("tradeToggle").checked = cfg.trade.enabled;
         document.getElementById("targetPlayer").value  = cfg.trade.targetPlayer || "";
+        document.getElementById("exemptTrainingReceiptsToggle").checked = cfg.trade.exemptTrainingReceipts;
 
         const el = document.getElementById("liveEnabled");
         el.textContent = cfg.trade.enabled ? "On" : "Off";
         el.className = "live-val " + (cfg.trade.enabled ? "on" : "off");
         document.getElementById("liveTarget").textContent = cfg.trade.targetPlayer || "—";
+        const el = document.getElementById("liveExemptTrainingReceipts");
+        el.textContent = cfg.trade.exemptTrainingReceipts ? "On" : "Off";
+        el.className = "live-val " + (cfg.trade.exemptTrainingReceipts ? "on" : "off");
 
         if (cfg.turnIn) {
             document.getElementById("turnInToggle").checked = cfg.turnIn.enabled;
