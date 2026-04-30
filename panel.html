@@ -403,6 +403,19 @@ nav {
                     <input type="text" id="targetPlayer" placeholder="Enter username…" autocomplete="off" autocorrect="off" autocapitalize="off">
                 </div>
             </div>
+
+            <div class="divider"></div>
+
+            <div class="section" style="padding-bottom:24px">
+                <div class="section-title">Turn-In & Auto-Sell</div>
+                <div class="toggle-row">
+                    <span class="toggle-name">Enabled</span>
+                    <label class="ios-toggle">
+                        <input type="checkbox" class="toggle-input" id="turnInToggle">
+                        <span class="ios-track"></span>
+                    </label>
+                </div>
+            </div>
         </div>
 
         <div class="divider"></div>
@@ -423,6 +436,10 @@ nav {
                 <div class="live-row">
                     <span class="live-key">Target player</span>
                     <span class="live-val" id="liveTarget">—</span>
+                </div>
+                <div class="live-row">
+                    <span class="live-key">Turn-in & sell</span>
+                    <span class="live-val on" id="liveTurnIn">On</span>
                 </div>
             </div>
             <div class="online-row">
@@ -449,15 +466,19 @@ themeBtn.addEventListener("click", () => {
 });
 
 async function saveConfig() {
-    const enabled = document.getElementById("tradeToggle").checked;
-    const targetPlayer = document.getElementById("targetPlayer").value.trim();
+    const tradeEnabled  = document.getElementById("tradeToggle").checked;
+    const targetPlayer  = document.getElementById("targetPlayer").value.trim();
+    const turnInEnabled = document.getElementById("turnInToggle").checked;
     const toast = document.getElementById("toast");
 
     try {
         const r = await fetch("/api/config", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ trade: { enabled, targetPlayer } })
+            body: JSON.stringify({
+                trade:  { enabled: tradeEnabled, targetPlayer },
+                turnIn: { enabled: turnInEnabled },
+            })
         });
         if (r.ok) {
             toast.className = "toast ok";
@@ -482,12 +503,19 @@ async function pollConfig() {
         const cfg = await r.json();
 
         document.getElementById("tradeToggle").checked = cfg.trade.enabled;
-        document.getElementById("targetPlayer").value = cfg.trade.targetPlayer || "";
+        document.getElementById("targetPlayer").value  = cfg.trade.targetPlayer || "";
 
         const el = document.getElementById("liveEnabled");
         el.textContent = cfg.trade.enabled ? "On" : "Off";
         el.className = "live-val " + (cfg.trade.enabled ? "on" : "off");
         document.getElementById("liveTarget").textContent = cfg.trade.targetPlayer || "—";
+
+        if (cfg.turnIn) {
+            document.getElementById("turnInToggle").checked = cfg.turnIn.enabled;
+            const ti = document.getElementById("liveTurnIn");
+            ti.textContent = cfg.turnIn.enabled ? "On" : "Off";
+            ti.className = "live-val " + (cfg.turnIn.enabled ? "on" : "off");
+        }
     } catch(e) {}
 }
 
