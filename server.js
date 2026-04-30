@@ -11,6 +11,9 @@ let sharedConfig = {
         enabled: false,
         targetPlayer: "",
     },
+    turnIn: {
+        enabled: true,
+    },
 };
 
 const server = http.createServer((req, res) => {
@@ -79,6 +82,9 @@ const server = http.createServer((req, res) => {
                 const data = JSON.parse(body);
                 if (data.trade !== undefined) {
                     sharedConfig.trade = { ...sharedConfig.trade, ...data.trade };
+                }
+                if (data.turnIn !== undefined) {
+                    sharedConfig.turnIn = { ...sharedConfig.turnIn, ...data.turnIn };
                 }
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(JSON.stringify({ ok: true, config: sharedConfig }));
