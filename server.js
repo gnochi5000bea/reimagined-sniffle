@@ -12,7 +12,7 @@ let sharedConfig = {
         targetPlayer: "",
     },
     turnIn: {
-        enabled: true,
+        enabled: false,
     },
 };
 
