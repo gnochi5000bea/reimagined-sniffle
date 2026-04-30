@@ -10,10 +10,10 @@ let sharedConfig = {
     trade: {
         enabled: false,
         targetPlayer: "",
-        exemptTrainingReceipts: false
+        exemptTrainingReceipts: false,
     },
     turnIn: {
-        enabled: false,
+        enabled: true,
     },
 };
 
