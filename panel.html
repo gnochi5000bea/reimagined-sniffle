@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WHI Control Panel</title>
+<title>Hatsune.miku Control Panel</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -370,7 +370,10 @@ nav {
 <body>
 
 <nav>
-    <span class="nav-logo">WHI</span>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img src="./logo.png" alt="logo" style="width:30px;height:30px;border-radius:7px;object-fit:cover;flex-shrink:0;">
+        <span class="nav-logo">hatsune.miku</span>
+    </div>
     <div class="nav-right">
         <a href="/" class="nav-link">← Dashboard</a>
         <button class="theme-btn" id="themeBtn">🌙</button>
@@ -561,5 +564,7 @@ pollOnline();
 setInterval(pollConfig, 5000);
 setInterval(pollOnline, 5000);
 </script>
+<a href="https://discord.gg/GgHvfFp38m" target="_blank" style="position:fixed;bottom:14px;right:18px;font-size:10px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text3);text-decoration:none;letter-spacing:0.2px;transition:color 0.15s;z-index:50;" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--text3)'">https://discord.gg/GgHvfFp38m</a>
+
 </body>
 </html>
