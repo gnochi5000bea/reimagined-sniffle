@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WHI Dashboard</title>
+<title>Hatsune.miku Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -154,7 +154,7 @@ nav {
 /* ── SUMMARY BAR ── */
 .summary {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 28px;
 }
@@ -167,8 +167,9 @@ nav {
     border-radius: 16px;
     padding: 20px 22px;
     box-shadow: var(--shadow);
-    transition: background 0.35s, border-color 0.35s, box-shadow 0.2s, transform 0.15s;
+    transition: background 0.35s, border-color 0.35s, box-shadow 0.2s, transform 0.15s, opacity 0.25s;
     animation: fade-up 0.4s ease both;
+    min-width: 0;
 }
 
 .scard:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
@@ -494,7 +495,8 @@ nav {
 
 <nav>
     <div class="nav-left">
-        <span class="nav-logo">WHI</span>
+        <img src="./logo.png" alt="logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;flex-shrink:0;">
+        <span class="nav-logo">hatsune.miku</span>
         <div class="live-chip">
             <span class="live-dot"></span>
             Live
@@ -518,12 +520,12 @@ nav {
             <div class="scard-val c-green" id="onlineCount">0</div>
         </div>
         <div class="scard" style="animation-delay:0.12s">
-            <div class="scard-label"><span class="scard-dot" style="background:var(--amber)"></span>Caught</div>
-            <div class="scard-val c-amber" id="totalCaught">0</div>
+            <div class="scard-label"><span class="scard-dot" style="background:var(--amber)"></span>Total Tokens</div>
+            <div class="scard-val c-amber" id="totalTokens">0</div>
         </div>
-        <div class="scard" style="animation-delay:0.18s">
-            <div class="scard-label"><span class="scard-dot" style="background:var(--purple)"></span>Receipts</div>
-            <div class="scard-val c-purple" id="totalReceipts">0</div>
+        <div class="scard" id="dynamicScard" style="animation-delay:0.18s; display:none">
+            <div class="scard-label"><span class="scard-dot" id="dynamicDot"></span><span id="dynamicLabel"></span></div>
+            <div class="scard-val" id="dynamicVal">0</div>
         </div>
     </div>
 
@@ -540,6 +542,8 @@ nav {
 
     <div class="grid" id="grid"></div>
 </div>
+
+<a href="https://discord.gg/GgHvfFp38m" target="_blank" style="position:fixed;bottom:14px;right:18px;font-size:10px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text3);text-decoration:none;letter-spacing:0.2px;transition:color 0.15s;z-index:50;" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--text3)'">https://discord.gg/GgHvfFp38m</a>
 
 <script>
 const OFFLINE = 30000;
@@ -570,6 +574,37 @@ document.querySelectorAll(".seg-btn").forEach(btn => {
         render();
     });
 });
+
+function updateDynamicScard(entries) {
+    const scard = document.getElementById("dynamicScard");
+    const dot   = document.getElementById("dynamicDot");
+    const label = document.getElementById("dynamicLabel");
+    const val   = document.getElementById("dynamicVal");
+
+    if (filter === "training") {
+        let receipts = 0;
+        entries.forEach(([, a]) => { if (!farming(a)) receipts += a.trainingReceipts || 0; });
+        const wasHidden = scard.style.display === "none";
+        scard.style.display = "";
+        if (wasHidden) { scard.style.animation = "none"; scard.offsetHeight; scard.style.animation = "fade-up 0.3s ease both"; }
+        dot.style.background = "var(--purple)";
+        label.textContent = "Training Receipts";
+        val.className = "scard-val c-purple";
+        val.textContent = receipts.toLocaleString();
+    } else if (filter === "farming") {
+        let caught = 0;
+        entries.forEach(([, a]) => { if (farming(a)) caught += a.animalsCaptured || 0; });
+        const wasHidden = scard.style.display === "none";
+        scard.style.display = "";
+        if (wasHidden) { scard.style.animation = "none"; scard.offsetHeight; scard.style.animation = "fade-up 0.3s ease both"; }
+        dot.style.background = "var(--green)";
+        label.textContent = "Animals Caught";
+        val.className = "scard-val c-green";
+        val.textContent = caught.toLocaleString();
+    } else {
+        scard.style.display = "none";
+    }
+}
 
 function ago(ts) {
     const d = Math.floor((Date.now() - ts) / 1000);
@@ -686,18 +721,17 @@ function render() {
         return true;
     });
 
-    let caught = 0, receipts = 0, onlineN = 0;
+    let tokens = 0, onlineN = 0;
     entries.forEach(([, a]) => {
-        caught += a.animalsCaptured || 0;
-        receipts += a.trainingReceipts || 0;
+        tokens += a.tokens || 0;
         if (online(a)) onlineN++;
     });
 
     document.getElementById("totalAccounts").textContent = entries.length;
     document.getElementById("onlineCount").textContent   = onlineN;
-    document.getElementById("totalCaught").textContent   = caught.toLocaleString();
-    document.getElementById("totalReceipts").textContent = receipts.toLocaleString();
+    document.getElementById("totalTokens").textContent   = tokens.toLocaleString();
     document.getElementById("resultCount").textContent   = filtered.length + " account" + (filtered.length !== 1 ? "s" : "");
+    updateDynamicScard(entries);
 
     // Remove cards that are no longer in filtered list
     const filteredNames = new Set(filtered.map(([n]) => n));
